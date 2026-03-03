@@ -2,6 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 Test commit
 I'm larry which rhymes with banary
+
 ## Getting Started
 
 First, run the development server:
