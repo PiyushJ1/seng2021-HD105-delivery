@@ -12,10 +12,7 @@
   "dependencies": {
     "mongodb": "^7.1.0",
     "next": "16.1.6",
-<<<<<<< HEAD
     "prettier": "^3.8.1",
-=======
->>>>>>> 0453ebc (build: init nextjs)
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
