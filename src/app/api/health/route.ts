@@ -15,7 +15,7 @@ export async function GET() {
   } catch (err) {
     return NextResponse.json(
       {
-        status: "down",
+        status: "degraded",
         service: "fulfilment-service",
         version: "1.0.0",
         time: new Date().toISOString(),
