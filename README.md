@@ -1,10 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Test commit
 =======
 Test commit
 I'm larry which rhymes with banary
+=======
+- Test commit
+- I'm larry which rhymes with banary
+>>>>>>> 4c5d0e4 (docs: format)
 
 ## Getting Started
 
