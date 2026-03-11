@@ -13,7 +13,7 @@ export async function getAuth(req: NextRequest): Promise<AuthResult | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret);
-    if (!payload.sub) return null; 
+    if (!payload.sub) return null;
     return {
       userId: payload.sub,
       role: payload.role as "delivery_party" | "despatch_party",
