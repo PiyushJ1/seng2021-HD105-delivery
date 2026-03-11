@@ -6,4 +6,10 @@ describe("despatch advice tests", () => {
       expect(1 + 2).toBe(3);
     });
   });
+
+  describe("POST /despatch_advice", () => {});
+
+  describe("GET /despatch_advice", () => {});
+
+  describe("GET /despatch_advice:despatchAdviceId", () => {});
 });
