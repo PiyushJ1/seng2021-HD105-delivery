@@ -3,29 +3,28 @@ import { describe, expect, test } from "vitest";
 
 const BASE_URL = "http://localhost:3000";
 
-describe("POST /receipt-advice", () => {
+function generateId() {
+  return "DES-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+}
 
-  const validBody = {
-    despatchId: "DES123",
-    deliveryPartyId: "DEL456",
-    receivedDate: "2026-03-01",
-    items: [
-      {
-        productId: "PROD1",
-        quantityReceived: 50
-      }
-    ]
-  };
+describe("POST /receipt-advice", () => {
 
   test("Creates receipt advice successfully", async () => {
     const res = await request(BASE_URL)
       .post("/api/receipt-advice")
-      .send(validBody);
+      .send({
+        despatchId: generateId(),
+        deliveryPartyId: "DEL456",
+        receivedDate: "2026-03-01",
+        items: [
+          { productId: "PROD1", quantityReceived: 50 }
+        ]
+      });
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({
       receiptAdviceId: expect.any(String),
-      status: expect.any(String),
+      status: "RECEIVED",
       totalItemsReceived: 50
     });
   });
@@ -34,7 +33,7 @@ describe("POST /receipt-advice", () => {
     const res = await request(BASE_URL)
       .post("/api/receipt-advice")
       .send({
-        despatchId: "DES124",
+        despatchId: generateId(),
         deliveryPartyId: "DEL456",
         receivedDate: "2026-03-01",
         items: [
@@ -43,6 +42,7 @@ describe("POST /receipt-advice", () => {
         ]
       });
 
+    expect(res.statusCode).toBe(200);
     expect(res.body.totalItemsReceived).toBe(50);
   });
 
@@ -72,13 +72,24 @@ describe("POST /receipt-advice", () => {
   });
 
   test("Returns 409 for duplicate receipt advice", async () => {
+    const id = generateId();
+
+    const body = {
+      despatchId: id,
+      deliveryPartyId: "DEL456",
+      receivedDate: "2026-03-01",
+      items: [
+        { productId: "PROD1", quantityReceived: 50 }
+      ]
+    };
+
     await request(BASE_URL)
       .post("/api/receipt-advice")
-      .send(validBody);
+      .send(body);
 
     const res = await request(BASE_URL)
       .post("/api/receipt-advice")
-      .send(validBody);
+      .send(body);
 
     expect(res.statusCode).toBe(409);
   });
