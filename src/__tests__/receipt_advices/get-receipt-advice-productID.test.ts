@@ -53,3 +53,104 @@ beforeEach(async () => {
   await db.collection("receiptAdvices").deleteMany({});
 });
 
+describe("GET /receipt-advices?productId={productId}", () => {
+  test("Returns 400 if productId is missing", async () => {
+    if (!mongoUri || !client) return;
+    const token = await makeToken("despatch_party");
+
+    const res = await request(BASE_URL)
+      .get("/api/receipt-advices")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      error: "Missing productId parameter",
+    });
+  });
+
+  test("Returns 403 if auth token is missing", async () => {
+    if (!mongoUri || !client) return;
+    const res = await request(BASE_URL)
+      .get("/api/receipt-advices")
+      .query({ productId: "PROD001" });
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({
+      error: "Not authorised to view",
+    });
+  });
+
+  test("Returns 403 if user is not a despatch party", async () => {
+    if (!mongoUri || !client) return;
+    const token = await makeToken("delivery_party", "DEL001");
+
+    const res = await request(BASE_URL)
+      .get("/api/receipt-advices")
+      .query({ productId: "PROD001" })
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({
+      error: "Not authorised to view",
+    });
+  });
+
+  test("Returns 404 if no receipt advice matches the productId", async () => {
+    if (!mongoUri || !client) return;
+    const token = await makeToken("despatch_party");
+
+    const res = await request(BASE_URL)
+      .get("/api/receipt-advices")
+      .query({ productId: "PROD001" })
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body).toEqual({
+      error: "No receipt found",
+    });
+  });
+
+  test("Returns matching receipt advice records for a valid despatch party", async () => {
+    if (!mongoUri || !client) return;
+    const db = client.db();
+    const productId = uniqueId("PROD");
+
+    await db.collection("receiptAdvices").insertMany([
+      {
+        receiptAdviceId: "REC001",
+        receivedDate: "2026-03-01",
+        items: [
+          { productId, quantityReceived: 50 },
+          { productId: uniqueId("OTHER"), quantityReceived: 20 },
+          { productId, quantityReceived: 30 },
+        ],
+      },
+      {
+        receiptAdviceId: "REC002",
+        receivedDate: "2026-03-02",
+        items: [{ productId, quantityReceived: 40 }],
+      },
+    ]);
+
+    const token = await makeToken("despatch_party");
+
+    const res = await request(BASE_URL)
+      .get("/api/receipt-advices")
+      .query({ productId })
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual([
+      {
+        receiptAdviceId: "REC001",
+        quantityReceived: 80,
+        receivedDate: "2026-03-01",
+      },
+      {
+        receiptAdviceId: "REC002",
+        quantityReceived: 40,
+        receivedDate: "2026-03-02",
+      },
+    ]);
+  });
+});
