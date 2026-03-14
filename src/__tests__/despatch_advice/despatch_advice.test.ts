@@ -99,6 +99,62 @@ describe("despatch advice tests", () => {
       expect(data).toHaveProperty("error");
       expect(data.error).toEqual(expect.any(String));
     });
+
+    it("returns 404 if the orderId is not found", async () => {
+      const res = await api
+        .post(DESPATCH_ENDPOINT)
+        .send(VALID_DESPATCH_REQUEST);
+      const data = res.body;
+
+      expect(res.status).toBe(404);
+
+      expect(data).toHaveProperty("error");
+      expect(data.error).toEqual(expect.any(String));
+    });
+
+    it("returns 409 if the despatch advice doc already exists for the order", async () => {
+      const res1 = await api
+        .post(DESPATCH_ENDPOINT)
+        .send(VALID_DESPATCH_REQUEST);
+      expect(res1.status).toBe(200);
+
+      const res2 = await api
+        .post(DESPATCH_ENDPOINT)
+        .send(VALID_DESPATCH_REQUEST);
+      const data = res2.body;
+
+      expect(res2.status).toBe(409);
+
+      expect(data).toHaveProperty("error");
+      expect(data.error).toEqual(expect.any(String));
+    });
+
+    it("returns 422 if there is a logic error (quantity > items in inventory)", async () => {
+      const req = {
+        orderId: "abc123",
+        supplierPartyId: "abc123",
+        deliveryPartyId: "abc123",
+        despatchDate: "2026-03-01",
+        items: [
+          {
+            productId: "prod1",
+            quantity: 999999,
+          },
+          {
+            productId: "prod2",
+            quantity: 100000,
+          },
+        ],
+      };
+
+      const res = await api.post(DESPATCH_ENDPOINT).send(req);
+      const data = res.body;
+
+      expect(res.status).toBe(422);
+
+      expect(data).toHaveProperty("error");
+      expect(data.error).toEqual(expect.any(String));
+    });
   });
 
   describe("GET /despatch-advice", () => {});
