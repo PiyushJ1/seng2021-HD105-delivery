@@ -188,5 +188,34 @@ describe("despatch advice tests", () => {
     );
   });
 
-  describe("GET /despatch-advice/:despatchAdviceId", () => {});
+  describe("GET /despatch-advice/:despatchAdviceId", () => {
+    it("returns 200 with details for a specific despatch advice doc", async () => {
+      const res1 = await api
+        .post(DESPATCH_ENDPOINT)
+        .send(VALID_DESPATCH_REQUEST);
+      const data1 = res1.body;
+
+      const res2 = await api.get(
+        `${DESPATCH_ENDPOINT}/${data1.despatchAdviceId}`,
+      );
+      const data2 = res2.body;
+
+      expect(res2.status).toBe(200);
+      expect(data2).toMatchObject({
+        despatchAdviceId: expect.any(String),
+        orderId: expect.any(String),
+        supplierPartyId: expect.any(String),
+        deliveryPartyId: expect.any(String),
+        despatchDate: expect.any(String),
+        status: expect.stringMatching(/^(Partial|Complete)$/),
+        items: expect.arrayContaining([
+          expect.objectContaining({
+            productId: expect.any(String),
+            quantity: expect.any(Number),
+          }),
+        ]),
+      });
+      expect(data1.despatchAdviceId).toEqual(data2.despatchAdviceId);
+    });
+  });
 });
