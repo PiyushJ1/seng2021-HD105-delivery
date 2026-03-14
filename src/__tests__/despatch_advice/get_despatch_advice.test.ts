@@ -36,4 +36,6 @@ describe("GET /despatch-advice/:despatchAdviceId", () => {
     expect(res.status).toBe(404);
     expect(data.error).toEqual(expect.any(String));
   });
+
+  it.todo("returns 403 if the delivery party does not have access to view doc");
 });
