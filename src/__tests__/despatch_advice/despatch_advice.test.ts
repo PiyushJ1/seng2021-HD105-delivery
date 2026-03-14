@@ -36,4 +36,12 @@ describe("despatch advice tests", () => {
       expect(["Partial", "Complete"]).toContain(data.status);
     });
   });
+
+  describe("GET /despatch-advice", () => {
+    
+  });
+
+  describe("GET /despatch-advice/:despatchAdviceId", () => {
+
+  });
 });
