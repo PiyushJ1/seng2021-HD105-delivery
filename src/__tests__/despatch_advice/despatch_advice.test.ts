@@ -217,5 +217,15 @@ describe("despatch advice tests", () => {
       });
       expect(data1.despatchAdviceId).toEqual(data2.despatchAdviceId);
     });
+
+    it("returns 404 if no despatch advice was found for the given id", async () => {
+      const res = await api.get(`${DESPATCH_ENDPOINT}/zzzzz111111`);
+      const data = res.body;
+
+      expect(res.status).toBe(404);
+
+      expect(data).toHaveProperty("error");
+      expect(data.error).toEqual(expect.any(String));
+    });
   });
 });
