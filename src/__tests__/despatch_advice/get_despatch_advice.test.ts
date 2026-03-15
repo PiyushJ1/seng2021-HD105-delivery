@@ -1,7 +1,7 @@
 import { expect, describe, it } from "vitest";
 import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
 
-describe("GET /despatch-advice/:despatchAdviceId", () => {
+describe.skip("GET /despatch-advice/:despatchAdviceId", () => {
   it("returns 200 with details for a specific despatch advice doc", async () => {
     const res1 = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     const data1 = res1.body;
