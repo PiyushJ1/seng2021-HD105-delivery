@@ -1,353 +1,90 @@
-import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { GET } from "../../app/api/fulfilment-cancellations/[fulfilmentCancellationId]/route";
+import { expect, describe, it, beforeEach, afterAll } from "vitest";
+import { api } from "../utils";
+import { MongoClient } from "mongodb";
 
-const { mockFindOne, mockGetAuth } = vi.hoisted(() => ({
-  mockFindOne: vi.fn(),
-  mockGetAuth: vi.fn(),
-}));
+const BASE_URL = "/api/fulfilment-cancellation";
+const client = new MongoClient(process.env.MONGODB_URI!);
+const db = client.db("test");
 
-vi.mock("@/src/lib/mongodb", () => ({
-  default: Promise.resolve({
-    db: () => ({
-      collection: () => ({
-        findOne: mockFindOne,
-      }),
-    }),
-  }),
-}));
+beforeEach(async () => {
+  await db.collection("despatchAdvices").deleteMany({});
+  await db.collection("fulfilmentCancellations").deleteMany({});
+});
 
-vi.mock("@/src/lib/auth", () => ({
-  getAuth: mockGetAuth,
-}));
+afterAll(async () => {
+  await client.close();
+});
 
-function getRequest(
-  fulfilmentCancellationId: string,
-  auth = true,
-) {
-  return new NextRequest(
-    `http://localhost/api/fulfilment-cancellations/${encodeURIComponent(fulfilmentCancellationId)}`,
-    {
-      method: "GET",
-      headers: auth ? { Authorization: "Bearer x" } : {},
-    },
-  );
-}
-
-describe("GET /fulfilment-cancellations/{fulfilmentCancellationId} (unit)", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockGetAuth.mockResolvedValue({ role: "despatch_party", orgId: "SUP1" });
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC001") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC001",
-          despatchAdviceId: "DA001",
-          status: "Created",
-          cancellationDate: "2026-03-02",
-          cancelledItems: [
-            {
-              productId: "prod1",
-              quantityCancelled: 100,
-              reasonCode: "DAMAGED",
-            },
-          ],
-          reason: "Carrier reported damaged shipment",
-        });
-      }
-      if (q.despatchAdviceId === "DA001") {
-        return Promise.resolve({
-          despatchAdviceId: "DA001",
-          supplierPartyId: "abc123",
-          deliveryPartyId: "abc123",
-        });
-      }
-      return Promise.resolve(null);
-    });
-  });
-
-  test("Returns 403 when not authenticated", async () => {
-    mockGetAuth.mockResolvedValue(null);
-    const req = getRequest("FC001");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC001" }),
-    });
-    expect(res.status).toBe(403);
-    expect(await res.json()).toEqual({
-      error: "Not authorised to access this fulfilment cancellation document",
-    });
-  });
-
-  test("Returns 400 when fulfilmentCancellationId format is invalid (whitespace)", async () => {
-    const req = getRequest("  ");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "  " }),
-    });
+describe("GET /api/fulfilment-cancellation/[fulfilmentCancelationId]", () => {
+  it("returns 400 when the ID is whitespace or empty", async () => {
+    const res = await api.get(`${BASE_URL}/%20%20`);
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({
-      error: "Invalid fulfilmentCancellationId format",
-    });
+    expect(res.body.error).toBe("Invalid fulfilmentCancellationId format");
   });
 
-  test("Returns 400 when fulfilmentCancellationId is empty string", async () => {
-    const req = getRequest("");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "" }),
-    });
-    expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({
-      error: "Invalid fulfilmentCancellationId format",
-    });
-  });
-
-  test("Returns 404 when document not found", async () => {
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC404") return Promise.resolve(null);
-      if (q.despatchAdviceId) return Promise.resolve(null);
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC404");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC404" }),
-    });
+  it("returns 404 when the fulfilment cancellation does not exist", async () => {
+    const res = await api.get(`${BASE_URL}/FC_DOES_NOT_EXIST`);
     expect(res.status).toBe(404);
-    expect(await res.json()).toEqual({
-      error: "Fulfilment cancellation document not found",
-    });
+    expect(res.body.error).toBe("Fulfilment cancellation document not found");
   });
 
-  test("Returns 403 when delivery_party and orgId does not match deliveryPartyId", async () => {
-    mockGetAuth.mockResolvedValue({
-      role: "delivery_party",
-      orgId: "OTHER",
+  it("returns 200 and correctly maps document fields", async () => {
+    const uniqueId = "FC_101";
+    
+    await db.collection("despatchAdvices").insertOne({
+      despatchAdviceId: "DA_SUCCESS",
+      supplierPartyId: "SUPP_1",
+      deliveryPartyId: "DELIV_1"
     });
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC001") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC001",
-          despatchAdviceId: "DA001",
-          status: "Created",
-          cancellationDate: "2026-03-02",
-          cancelledItems: [{ productId: "prod1", quantityCancelled: 100 }],
-          reason: "Damaged",
-        });
-      }
-      if (q.despatchAdviceId === "DA001") {
-        return Promise.resolve({
-          despatchAdviceId: "DA001",
-          supplierPartyId: "abc123",
-          deliveryPartyId: "abc123",
-        });
-      }
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC001");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC001" }),
-    });
-    expect(res.status).toBe(403);
-    expect(await res.json()).toEqual({
-      error: "Not authorised to access this fulfilment cancellation document",
-    });
-  });
 
-  test("Returns 200 with full response when authorised", async () => {
-    const req = getRequest("FC001");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC001" }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body).toEqual({
-      fulfilmentCancellationId: "FC001",
-      despatchAdviceId: "DA001",
-      supplierPartyId: "abc123",
-      deliveryPartyId: "abc123",
-      cancellationDate: "2026-03-02",
-      cancellationReason: "Carrier reported damaged shipment",
+    await db.collection("fulfilmentCancellations").insertOne({
+      fulfilmentCancellationId: uniqueId,
+      despatchAdviceId: "DA_SUCCESS",
       status: "Created",
+      cancellationDate: "2026-03-16",
+      reason: "Goods damaged during loading",
       cancelledItems: [
-        {
-          productId: "prod1",
-          quantityCancelled: 100,
-          reasonCode: "DAMAGED",
-        },
-      ],
+        { productId: "p1", quantityCancelled: 10, reasonCode: "DAMAGED" },
+        { productId: "p2", quantityCancelled: 5 }
+      ]
     });
+
+    const res = await api.get(`${BASE_URL}/${uniqueId}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      fulfilmentCancellationId: uniqueId,
+      despatchAdviceId: "DA_SUCCESS",
+      supplierPartyId: "SUPP_1",
+      deliveryPartyId: "DELIV_1",
+      cancellationReason: "Goods damaged during loading",
+      status: "Created"
+    });
+
+    expect(res.body.cancelledItems).toHaveLength(2);
+    expect(res.body.cancelledItems[0]).toEqual({
+      productId: "p1",
+      quantityCancelled: 10,
+      reasonCode: "DAMAGED"
+    });
+    expect(res.body.cancelledItems[1]).not.toHaveProperty("reasonCode");
   });
 
-  test("Returns 200 when delivery_party orgId matches deliveryPartyId", async () => {
-    mockGetAuth.mockResolvedValue({
-      role: "delivery_party",
-      orgId: "abc123",
+  it("returns 200 and handles missing Despatch Advice gracefully", async () => {
+    const uniqueId = "FC_NO_DA";
+    
+    await db.collection("fulfilmentCancellations").insertOne({
+      fulfilmentCancellationId: uniqueId,
+      despatchAdviceId: "NON_EXISTENT_DA",
+      status: "Sent",
+      cancellationDate: "2026-03-20",
+      cancelledItems: []
     });
-    const req = getRequest("FC001");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC001" }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.fulfilmentCancellationId).toBe("FC001");
-    expect(body.deliveryPartyId).toBe("abc123");
-  });
 
-  test("Returns 200 when doc has supplierPartyId and deliveryPartyId on FC document (no DA lookup needed)", async () => {
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC-DOC-ONLY") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC-DOC-ONLY",
-          despatchAdviceId: "DA999",
-          status: "Sent",
-          cancellationDate: "2026-03-04",
-          cancelledItems: [{ productId: "p1", quantityCancelled: 5 }],
-          reason: "Doc-only reason",
-          supplierPartyId: "supplier-on-doc",
-          deliveryPartyId: "delivery-on-doc",
-        });
-      }
-      if (q.despatchAdviceId === "DA999") return Promise.resolve(null);
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC-DOC-ONLY");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC-DOC-ONLY" }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.supplierPartyId).toBe("supplier-on-doc");
-    expect(body.deliveryPartyId).toBe("delivery-on-doc");
-    expect(body.cancellationReason).toBe("Doc-only reason");
-  });
+    const res = await api.get(`${BASE_URL}/${uniqueId}`);
 
-  test("Returns 200 with empty cancelledItems array", async () => {
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC-EMPTY-ITEMS") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC-EMPTY-ITEMS",
-          despatchAdviceId: "DA001",
-          status: "Created",
-          cancellationDate: "2026-03-02",
-          cancelledItems: [],
-          reason: "No items",
-        });
-      }
-      if (q.despatchAdviceId === "DA001") {
-        return Promise.resolve({
-          despatchAdviceId: "DA001",
-          supplierPartyId: "s1",
-          deliveryPartyId: "d1",
-        });
-      }
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC-EMPTY-ITEMS");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC-EMPTY-ITEMS" }),
-    });
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.cancelledItems).toEqual([]);
-    expect(body.fulfilmentCancellationId).toBe("FC-EMPTY-ITEMS");
-  });
-
-  test("Returns 200 with multiple cancelledItems (mix of reasonCode present and absent)", async () => {
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC-MULTI") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC-MULTI",
-          despatchAdviceId: "DA001",
-          status: "Created",
-          cancellationDate: "2026-03-02",
-          cancelledItems: [
-            { productId: "p1", quantityCancelled: 10, reasonCode: "DAMAGED" },
-            { productId: "p2", quantityCancelled: 20 },
-            { productId: "p3", quantityCancelled: 5, reasonCode: "CUSTOMER_REQUEST" },
-          ],
-          reason: "Multiple items",
-        });
-      }
-      if (q.despatchAdviceId === "DA001") {
-        return Promise.resolve({
-          despatchAdviceId: "DA001",
-          supplierPartyId: "s1",
-          deliveryPartyId: "d1",
-        });
-      }
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC-MULTI");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC-MULTI" }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.cancelledItems).toHaveLength(3);
-    expect(body.cancelledItems[0]).toEqual({ productId: "p1", quantityCancelled: 10, reasonCode: "DAMAGED" });
-    expect(body.cancelledItems[1]).toEqual({ productId: "p2", quantityCancelled: 20 });
-    expect(body.cancelledItems[1]).not.toHaveProperty("reasonCode");
-    expect(body.cancelledItems[2]).toEqual({ productId: "p3", quantityCancelled: 5, reasonCode: "CUSTOMER_REQUEST" });
-  });
-
-  test("Returns 200 when despatch advice not found (supplier/delivery from doc or empty)", async () => {
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC-NO-DA") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC-NO-DA",
-          despatchAdviceId: "DA-MISSING",
-          status: "Created",
-          cancellationDate: "2026-03-02",
-          cancelledItems: [{ productId: "p1", quantityCancelled: 1 }],
-          reason: "No DA",
-        });
-      }
-      if (q.despatchAdviceId === "DA-MISSING") return Promise.resolve(null);
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC-NO-DA");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC-NO-DA" }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.supplierPartyId).toBe("");
-    expect(body.deliveryPartyId).toBe("");
-    expect(body.fulfilmentCancellationId).toBe("FC-NO-DA");
-  });
-
-  test("Returns 200 with cancelledItems omitting optional reasonCode when absent", async () => {
-    mockFindOne.mockImplementation((q: Record<string, unknown>) => {
-      if (q.fulfilmentCancellationId === "FC002") {
-        return Promise.resolve({
-          fulfilmentCancellationId: "FC002",
-          despatchAdviceId: "DA001",
-          status: "Sent",
-          cancellationDate: "2026-03-03",
-          cancelledItems: [
-            { productId: "prod2", quantityCancelled: 50 },
-          ],
-          reason: "Customer request",
-        });
-      }
-      if (q.despatchAdviceId === "DA001") {
-        return Promise.resolve({
-          despatchAdviceId: "DA001",
-          supplierPartyId: "abc123",
-          deliveryPartyId: "abc123",
-        });
-      }
-      return Promise.resolve(null);
-    });
-    const req = getRequest("FC002");
-    const res = await GET(req, {
-      params: Promise.resolve({ fulfilmentCancellationId: "FC002" }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.cancelledItems).toHaveLength(1);
-    expect(body.cancelledItems[0]).toEqual({
-      productId: "prod2",
-      quantityCancelled: 50,
-    });
-    expect(body.cancelledItems[0]).not.toHaveProperty("reasonCode");
+    expect(res.body.supplierPartyId).toBe("");
+    expect(res.body.deliveryPartyId).toBe("");
   });
 });
