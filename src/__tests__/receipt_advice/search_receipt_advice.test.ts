@@ -3,7 +3,7 @@ import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
 import { MongoClient } from "mongodb";
 
 const RECEIPT_POST_ENDPOINT = "/api/receipt-advice";
-const PRODUCT_SEARCH_ENDPOINT = "/api/receipt-advices";
+const PRODUCT_SEARCH_ENDPOINT = "/api/receipt-advice";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db("test");
@@ -17,8 +17,8 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("GET /api/receipt-advices?productId={productId}", () => {
-  it("returns 200 and a list of receipts containing the product", async () => {
+describe("GET /api/receipt-advice?productId={productId}", () => {
+  it.skip("returns 200 and a list of receipts containing the product", async () => {
     const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
 
