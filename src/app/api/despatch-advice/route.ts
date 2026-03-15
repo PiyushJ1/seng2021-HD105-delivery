@@ -3,12 +3,6 @@ import { randomUUID } from "crypto";
 import { DespatchAdviceRequest } from "@/src/types";
 import clientPromise from "@/src/lib/mongodb";
 
-const client = await clientPromise;
-
-const dbName = process.env.NODE_ENV === "development" ? "test" : "production";
-const db = client.db(dbName);
-const collection = db.collection("despatch_advice");
-
 // mock fetching order for now
 // TODO: fetch the actual order
 async function getOrder(orderId: string) {
@@ -22,6 +16,13 @@ async function getInventory(productId: string) {
 }
 
 export async function POST(req: NextRequest) {
+  // setup db connection
+  const client = await clientPromise;
+  const db = client.db(
+    process.env.NODE_ENV === "development" ? "test" : "production",
+  );
+  const collection = db.collection("despatch_advice");
+
   const body: DespatchAdviceRequest = await req.json();
 
   // missing/invalid body validation
