@@ -18,7 +18,7 @@ describe("GET /despatch-advice", () => {
     // send two despatch creation requests
     await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     const req = {
-      orderId: "abc123",
+      orderId: "abc789",
       supplierPartyId: "abc123",
       deliveryPartyId: "abc123",
       despatchDate: "2026-03-01",
