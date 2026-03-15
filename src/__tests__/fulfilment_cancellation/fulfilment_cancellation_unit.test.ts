@@ -1,267 +1,220 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { POST } from "../../app/api/fulfilment-cancellation/route";
 
-type PostHandler = (req: NextRequest) => Promise<Response>;
+const { mockFindOne, mockInsertOne, mockGetAuth } = vi.hoisted(() => ({
+  mockFindOne: vi.fn(),
+  mockInsertOne: vi.fn(),
+  mockGetAuth: vi.fn(),
+}));
 
-const mocks = vi.hoisted(() => {
-  const despatchAdvices = {
-    findOne: vi.fn(),
-  };
-
-  const fulfilmentCancellations = {
-    findOne: vi.fn(),
-    insertOne: vi.fn(),
-  };
-
-  const db = {
-    collection: vi.fn((name: string) => {
-      if (name === "despatchAdvices") return despatchAdvices;
-      if (name === "fulfilmentCancellations") return fulfilmentCancellations;
-      throw new Error(`Unexpected collection: ${name}`);
+vi.mock("@/src/lib/mongodb", () => ({
+  default: Promise.resolve({
+    db: () => ({
+      collection: () => ({
+        findOne: mockFindOne,
+        insertOne: mockInsertOne,
+      }),
     }),
-  };
+  }),
+}));
+vi.mock("@/src/lib/auth", () => ({
+  getAuth: mockGetAuth,
+}));
 
-  const client = {
-    db: vi.fn(() => db),
-  };
-
-  return {
-    despatchAdvices,
-    fulfilmentCancellations,
-    db,
-    client,
-  };
-});
-
-let POST: PostHandler;
-let mockedGetAuth: ReturnType<typeof vi.fn>;
-
-function makeRequest(body: unknown) {
-  return new NextRequest("http://localhost:3000/api/fulfilment-cancellation", {
+function jsonRequest(body: unknown, url = "http://localhost/api/fulfilment-cancellation") {
+  return new NextRequest(url, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 }
 
-describe("POST /fulfilment-cancellation unit", () => {
-    beforeEach(async () => {
-      vi.resetModules();
-      vi.clearAllMocks();
-  
-      vi.doMock("@/src/lib/mongodb", () => ({
-        default: Promise.resolve(mocks.client),
-      }));
-  
-      vi.doMock("@/src/lib/auth", () => ({
-        getAuth: vi.fn(),
-      }));
-  
-      const routeModule = await import("../../app/api/fulfilment-cancellation/route");
-      POST = routeModule.POST;
-  
-      const authModule = await import("@/src/lib/auth");
-      mockedGetAuth = vi.mocked(authModule.getAuth);
+describe("POST /fulfilment-cancellation (unit)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuth.mockResolvedValue({ role: "despatch_party" });
+  });
+
+  test("Returns 403 if user is not despatch_party", async () => {
+    mockGetAuth.mockResolvedValue(null);
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "prod1", quantityCancelled: 10 }],
     });
-  
-    test("returns 403 if user is not authorised", async () => {
-      mockedGetAuth.mockResolvedValue(null);
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES2001",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [{ productId: "prod1", quantityCancelled: 20 }],
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(403);
-      expect(body).toEqual({
-        error: "Not authorized to create fulfilment cancellation document",
-      });
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({
+      error: "Not authorized to create fulfilment cancellation document",
     });
-  
-    test("returns 400 if fields are missing", async () => {
-      mockedGetAuth.mockResolvedValue({
-        userId: "user-1",
-        role: "despatch_party",
-      });
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES2001",
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(400);
-      expect(body).toEqual({
-        error: "Invalid or missing fields",
-      });
+  });
+
+  test("Returns 403 if role is delivery_party", async () => {
+    mockGetAuth.mockResolvedValue({ role: "delivery_party", orgId: "DEL001" });
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "prod1", quantityCancelled: 10 }],
     });
-  
-    test("returns 404 if despatchAdviceId is not found", async () => {
-      mockedGetAuth.mockResolvedValue({
-        userId: "user-1",
-        role: "despatch_party",
-      });
-  
-      mocks.despatchAdvices.findOne.mockResolvedValue(null);
-      mocks.fulfilmentCancellations.findOne.mockResolvedValue(null);
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES404",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [{ productId: "prod1", quantityCancelled: 20 }],
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(404);
-      expect(body).toEqual({
-        error: "despatchAdviceId not found",
-      });
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+  });
+
+  test("Returns 400 if body is invalid JSON", async () => {
+    const req = new NextRequest("http://localhost/api/fulfilment-cancellation", {
+      method: "POST",
+      body: "not json",
     });
-  
-    test("returns 409 if fulfilment cancellation already exists", async () => {
-      mockedGetAuth.mockResolvedValue({
-        userId: "user-1",
-        role: "despatch_party",
-      });
-  
-      mocks.despatchAdvices.findOne.mockResolvedValue({
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "Invalid or missing fields" });
+  });
+
+  test("Returns 400 if required fields are missing", async () => {
+    const req = jsonRequest({ despatchAdviceId: "DES2001" });
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "Invalid or missing fields" });
+  });
+
+  test("Returns 400 if cancellationDate is invalid format", async () => {
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "01-03-2026",
+      cancelledItems: [{ productId: "prod1", quantityCancelled: 20 }],
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "Invalid or missing fields" });
+  });
+
+  test("Returns 400 if cancelledItems has invalid line", async () => {
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "", quantityCancelled: 10 }],
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "Invalid or missing fields" });
+  });
+
+  test("Returns 404 if despatchAdviceId not found", async () => {
+    mockFindOne.mockImplementation((filter: { despatchAdviceId?: string }) => {
+      if (filter.despatchAdviceId === "DES2001") return null;
+      return null;
+    });
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "prod1", quantityCancelled: 10 }],
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "despatchAdviceId not found" });
+  });
+
+  test("Returns 409 if fulfilment cancellation already exists", async () => {
+    mockFindOne
+      .mockResolvedValueOnce({
         despatchAdviceId: "DES2001",
         items: [{ productId: "prod1", quantityDespatched: 50 }],
-      });
-  
-      mocks.fulfilmentCancellations.findOne.mockResolvedValue({
-        fulfilmentCancellationId: "FC001",
-        despatchAdviceId: "DES2001",
-        status: "Created",
-      });
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES2001",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [{ productId: "prod1", quantityCancelled: 20 }],
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(409);
-      expect(body).toEqual({
-        error:
-          "Fulfilment cancellation document already exists for this despatchAdviceId",
-      });
+      })
+      .mockResolvedValueOnce({ fulfilmentCancellationId: "FC001" });
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "prod1", quantityCancelled: 10 }],
     });
-  
-    test("returns 422 if productId is not in despatch advice", async () => {
-      mockedGetAuth.mockResolvedValue({
-        userId: "user-1",
-        role: "despatch_party",
-      });
-  
-      mocks.despatchAdvices.findOne.mockResolvedValue({
-        despatchAdviceId: "DES2001",
-        items: [{ productId: "prod1", quantityDespatched: 50 }],
-      });
-  
-      mocks.fulfilmentCancellations.findOne.mockResolvedValue(null);
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES2001",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [{ productId: "prod999", quantityCancelled: 10 }],
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(422);
-      expect(body).toEqual({
-        error: "productId not in despatch advice: prod999",
-      });
+    const res = await POST(req);
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({
+      error: "Fulfilment cancellation document already exists for this despatchAdviceId",
     });
-  
-    test("returns 422 if quantityCancelled exceeds quantity despatched", async () => {
-      mockedGetAuth.mockResolvedValue({
-        userId: "user-1",
-        role: "despatch_party",
-      });
-  
-      mocks.despatchAdvices.findOne.mockResolvedValue({
-        despatchAdviceId: "DES2001",
-        items: [{ productId: "prod1", quantityDespatched: 50 }],
-      });
-  
-      mocks.fulfilmentCancellations.findOne.mockResolvedValue(null);
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES2001",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [{ productId: "prod1", quantityCancelled: 60 }],
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(422);
-      expect(body).toEqual({
-        error: "quantityCancelled exceeds quantity despatched for productId: prod1",
-      });
+  });
+
+  test("Returns 422 if productId not in despatch advice", async () => {
+    mockFindOne.mockResolvedValueOnce({
+      despatchAdviceId: "DES2001",
+      items: [{ productId: "prod1", quantityDespatched: 50 }],
+    }).mockResolvedValueOnce(null);
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "prod999", quantityCancelled: 10 }],
     });
-  
-    test("creates fulfilment cancellation successfully", async () => {
-      mockedGetAuth.mockResolvedValue({
-        userId: "user-1",
-        role: "despatch_party",
-      });
-  
-      mocks.despatchAdvices.findOne.mockResolvedValue({
+    const res = await POST(req);
+    expect(res.status).toBe(422);
+    expect(await res.json()).toEqual({
+      error: "productId not in despatch advice: prod999",
+    });
+  });
+
+  test("Returns 422 if quantityCancelled exceeds quantity despatched", async () => {
+    mockFindOne.mockResolvedValueOnce({
+      despatchAdviceId: "DES2001",
+      items: [{ productId: "prod1", quantityDespatched: 50 }],
+    }).mockResolvedValueOnce(null);
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [{ productId: "prod1", quantityCancelled: 60 }],
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(422);
+    expect(await res.json()).toEqual({
+      error: "quantityCancelled exceeds quantity despatched for productId: prod1",
+    });
+  });
+
+  test("Returns 422 when summed duplicate productIds exceed despatched", async () => {
+    mockFindOne.mockResolvedValueOnce({
+      despatchAdviceId: "DES2001",
+      items: [{ productId: "prod1", quantityDespatched: 25 }],
+    }).mockResolvedValueOnce(null);
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [
+        { productId: "prod1", quantityCancelled: 20 },
+        { productId: "prod1", quantityCancelled: 10 },
+      ],
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(422);
+    expect(await res.json()).toEqual({
+      error: "quantityCancelled exceeds quantity despatched for productId: prod1",
+    });
+  });
+
+  test("Creates fulfilment cancellation successfully", async () => {
+    mockFindOne
+      .mockResolvedValueOnce({
         despatchAdviceId: "DES2001",
         items: [
           { productId: "prod1", quantityDespatched: 50 },
           { productId: "prod2", quantityDespatched: 20 },
         ],
-      });
-  
-      mocks.fulfilmentCancellations.findOne.mockResolvedValue(null);
-      mocks.fulfilmentCancellations.insertOne.mockResolvedValue({
-        acknowledged: true,
-        insertedId: "mock-id",
-      });
-  
-      const req = makeRequest({
-        despatchAdviceId: "DES2001",
-        reason: "damaged goods in transit",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [
-          {
-            productId: "prod1",
-            quantityCancelled: 20,
-            reasonCode: "DAMAGED",
-          },
-          {
-            productId: "prod2",
-            quantityCancelled: 10,
-            reasonCode: "CUSTOMER_REQUEST",
-          },
-        ],
-      });
-  
-      const res = await POST(req);
-      const body = await res.json();
-  
-      expect(res.status).toBe(200);
-      expect(body).toEqual({
-        fulfilmentCancellationId: expect.any(String),
-        status: "Created",
-        despatchAdviceId: "DES2001",
-      });
+      })
+      .mockResolvedValueOnce(null);
+    mockInsertOne.mockResolvedValue(undefined);
+
+    const req = jsonRequest({
+      despatchAdviceId: "DES2001",
+      reason: "damaged goods in transit",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [
+        { productId: "prod1", quantityCancelled: 20, reasonCode: "DAMAGED" },
+        { productId: "prod2", quantityCancelled: 10, reasonCode: "CUSTOMER_REQUEST" },
+      ],
     });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.fulfilmentCancellationId).toBeDefined();
+    expect(data.status).toBe("Created");
+    expect(data.despatchAdviceId).toBe("DES2001");
+    expect(mockInsertOne).toHaveBeenCalledOnce();
   });
+});
