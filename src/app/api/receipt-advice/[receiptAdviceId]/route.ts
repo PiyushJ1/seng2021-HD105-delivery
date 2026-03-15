@@ -7,8 +7,8 @@ type ReceiptItem = {
 };
 
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { receiptAdviceId: string } }
+    req: NextRequest,
+    { params }: { params: Promise<{ receiptAdviceId: string }> }
 ) {
   const client = await clientPromise;
   const db = client.db(
@@ -20,7 +20,8 @@ export async function PUT(
   const receiptCollection = db.collection("receipt_advice");
   const despatchCollection = db.collection("despatch_advice");
 
-  const receiptAdviceId = params.receiptAdviceId;
+  const resolvedParams = await params;
+  const receiptAdviceId = resolvedParams.receiptAdviceId;
   
   let body;
   try {
@@ -31,6 +32,8 @@ export async function PUT(
       { status: 400 }
     );
   }
+
+  console.log("DEBUG - Route hit! ID:", receiptAdviceId, "Payload:", body);
 
   if (
     !body.items ||
