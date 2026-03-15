@@ -1,5 +1,17 @@
-import { expect, describe, it } from "vitest";
+import { expect, describe, it, beforeEach, afterAll } from "vitest";
 import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
+import { MongoClient } from "mongodb";
+
+const client = new MongoClient(process.env.MONGODB_URI!);
+const collection = client.db("test").collection("despatch_advice");
+
+beforeEach(async () => {
+  await collection.deleteMany({});
+});
+
+afterAll(async () => {
+  await client.close();
+});
 
 describe("POST /despatch-advice", () => {
   // happy path
@@ -64,7 +76,23 @@ describe("POST /despatch-advice", () => {
   });
 
   it("returns 404 if the orderId is not found", async () => {
-    const res = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const req = {
+      orderId: "hello123",
+      supplierPartyId: "abc123",
+      deliveryPartyId: "abc123",
+      despatchDate: "2026-03-01",
+      items: [
+        {
+          productId: "prod1",
+          quantity: 10,
+        },
+        {
+          productId: "prod2",
+          quantity: 20,
+        },
+      ],
+    };
+    const res = await api.post(DESPATCH_ENDPOINT).send(req);
     const data = res.body;
 
     expect(res.status).toBe(404);
