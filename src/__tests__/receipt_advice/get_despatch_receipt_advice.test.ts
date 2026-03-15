@@ -7,7 +7,7 @@ import {
 import { MongoClient } from "mongodb";
 
 const RECEIPT_POST_ENDPOINT = "/api/receipt-advice";
-const DESPATCH_VIEW_ENDPOINT = "/api/despatch/receipt-advices";
+const DESPATCH_VIEW_ENDPOINT = "/api/despatch/receipt-advice";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db("test");
@@ -23,7 +23,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("GET /api/despatch/receipt-advices/:receiptAdviceId", () => {
+describe("GET /api/despatch/receipt-advice/:receiptAdviceId", () => {
   it("returns 200 and full details with flattened deliveryPartyId in items", async () => {
     const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
