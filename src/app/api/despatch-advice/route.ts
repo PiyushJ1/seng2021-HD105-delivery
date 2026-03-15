@@ -7,8 +7,15 @@ const db = client.db("myFirstDatabase");
 const collection = db.collection("despatch_advice");
 
 // mock fetching order for now
+// TODO: fetch the actual order
 async function getOrder(orderId: string) {
   return orderId === "abc123" ? { orderId } : null;
+}
+
+// mock getting the inventory for a product given its ID
+// TODO: fetch the actual inventory for a product
+async function getInventory(productId: string) {
+  return { productId, remainingQuantity: 100 };
 }
 
 export async function POST(req: NextRequest) {
@@ -45,5 +52,16 @@ export async function POST(req: NextRequest) {
       { error: "Despatch advice doc already exists for this order" },
       { status: 409 },
     );
+  }
+
+  // validate that item quantities requested have available stock
+  for (const item of body.items) {
+    const inventory = await getInventory(item.productId);
+    if (inventory.remainingQuantity < item.quantity) {
+      return NextResponse.json(
+        { error: "item quantity exceeds the quantiy available" },
+        { status: 422 },
+      );
+    }
   }
 }
