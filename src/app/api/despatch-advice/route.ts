@@ -1,9 +1,12 @@
-import { DespatchAdviceRequest } from "@/src/types";
 import { NextResponse, NextRequest } from "next/server";
+import { randomUUID } from "crypto";
+import { DespatchAdviceRequest } from "@/src/types";
 import clientPromise from "@/src/lib/mongodb";
 
 const client = await clientPromise;
-const db = client.db("myFirstDatabase");
+
+const dbName = process.env.NODE_ENV === "development" ? "test" : "production";
+const db = client.db(dbName);
 const collection = db.collection("despatch_advice");
 
 // mock fetching order for now
@@ -39,7 +42,8 @@ export async function POST(req: NextRequest) {
   }
 
   // validate orderId exists
-  if (!getOrder(body.orderId)) {
+  const order = await getOrder(body.orderId);
+  if (!order) {
     return NextResponse.json(
       { error: "the orderId was not found" },
       { status: 404 },
@@ -59,9 +63,27 @@ export async function POST(req: NextRequest) {
     const inventory = await getInventory(item.productId);
     if (inventory.remainingQuantity < item.quantity) {
       return NextResponse.json(
-        { error: "item quantity exceeds the quantiy available" },
+        { error: "item quantity exceeds the quantity available" },
         { status: 422 },
       );
     }
   }
+
+  const despatchAdviceId = randomUUID();
+
+  // create and insert despatch advice "doc" into db
+  await collection.insertOne({
+    despatchAdviceId,
+    orderId: body.orderId,
+    supplierPartyId: body.supplierPartyId,
+    deliveryPartyId: body.deliveryPartyId,
+    despatchDate: body.despatchDate,
+    items: body.items,
+    status: "Complete",
+  });
+
+  return NextResponse.json({
+    despatchAdviceId,
+    status: "Complete",
+  });
 }
