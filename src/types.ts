@@ -6,6 +6,16 @@ export type DespatchAdviceRequest = {
   items: DespatchItem[];
 };
 
+export type DespatchAdvice = {
+  despatchAdviceId: string;
+  orderId: string;
+  supplierPartyId: string;
+  deliveryPartyId: string;
+  despatchDate: string;
+  status: string;
+  items: DespatchItem[];
+};
+
 export type DespatchItem = {
   productId: string;
   quantity: number;
