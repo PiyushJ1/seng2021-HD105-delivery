@@ -88,3 +88,18 @@ export async function POST(req: NextRequest) {
     status: "Complete",
   });
 }
+
+export async function GET() {
+  // setup db connection
+  const client = await clientPromise;
+  const db = client.db(
+    process.env.NODE_ENV === "development" ? "test" : "production",
+  );
+  const collection = db.collection("despatch_advice");
+
+  const despatchAdvices = await collection
+    .find({}, { projection: { _id: 0 } })
+    .toArray();
+
+  return NextResponse.json({ despatchAdvices }, { status: 200 });
+}
