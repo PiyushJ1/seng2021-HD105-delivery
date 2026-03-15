@@ -149,7 +149,7 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.body).toEqual({
-      error: "inventoryAdjustmentLines must be a non-empty array",
+      error: "empty lines",
     });
   });
 
@@ -170,7 +170,7 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.body).toEqual({
-      error: "Each inventoryAdjustmentLine must include a sku",
+      error: "Invalid or missing fields",
     });
   });
 
@@ -191,8 +191,48 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.body).toEqual({
-      error: "Each inventoryAdjustmentLine must include a valid quantityReceived",
+      error: "Invalid or missing fields",
     });
+  });
+
+  test("Returns 400 if quantityReceived is negative", async () => {
+    if (!mongoUri || !jwtSecret || !client) return;
+    const token = await generateToken("despatch_party");
+
+    const res = await request(BASE_URL)
+      .put(`/api/supply/inventory-updates/${generateId("RA")}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        warehouseId: "W-1",
+        binId: "B-1",
+        inventoryAdjustmentLines: [
+          { sku: "SKU-001", uom: "EA", quantityReceived: -1 },
+        ],
+      });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      error: "negative quantityReceived",
+    });
+  });
+
+  test("Returns 400 if warehouseId is bad UUID format", async () => {
+    if (!mongoUri || !jwtSecret || !client) return;
+    const token = await generateToken("despatch_party");
+
+    const res = await request(BASE_URL)
+      .put(`/api/supply/inventory-updates/${generateId("RA")}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        warehouseId: "550e8400-e29b-71d4-a716-446655440000",
+        binId: "B-1",
+        inventoryAdjustmentLines: [
+          { sku: "SKU-001", uom: "EA", quantityReceived: 10 },
+        ],
+      });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({ error: "bad UUID format" });
   });
 
   test("Returns 404 if receipt advice does not exist", async () => {
@@ -223,7 +263,8 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(404);
     expect(res.body).toEqual({
-      error: "receipt advice ID not found",
+      error:
+        "receipt advice ID, warehouse ID or bin ID not found",
     });
   });
 
@@ -251,7 +292,8 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(404);
     expect(res.body).toEqual({
-      error: "warehouse ID not found",
+      error:
+        "receipt advice ID, warehouse ID or bin ID not found",
     });
   });
 
@@ -283,7 +325,8 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(404);
     expect(res.body).toEqual({
-      error: "bin ID not found",
+      error:
+        "receipt advice ID, warehouse ID or bin ID not found",
     });
   });
 
@@ -321,7 +364,45 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(409);
     expect(res.body).toEqual({
-      error: "receipt advice already applied",
+      error: "receipt already applied",
+    });
+  });
+
+  test("Returns 409 if receipt advice not in applicable state", async () => {
+    if (!mongoUri || !jwtSecret || !client) return;
+    const token = await generateToken("despatch_party");
+
+    const db = client.db();
+    await db.collection("receiptAdvices").insertOne({
+      receiptAdviceId: "RA12345",
+      receivedDate: "2026-03-01",
+      status: "cancelled",
+      items: [{ sku: "SKU-001", uom: "EA", quantityReceived: 10 }],
+    });
+    await db.collection("warehouses").insertOne({
+      warehouseId: "W-1",
+      name: "Main Warehouse",
+    });
+    await db.collection("bins").insertOne({
+      warehouseId: "W-1",
+      binId: "B-1",
+      label: "Bin 1",
+    });
+
+    const res = await request(BASE_URL)
+      .put("/api/supply/inventory-updates/RA12345")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        warehouseId: "W-1",
+        binId: "B-1",
+        inventoryAdjustmentLines: [
+          { sku: "SKU-001", uom: "EA", quantityReceived: 10 },
+        ],
+      });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.body).toEqual({
+      error: "receipt advice not in a state that can be applied",
     });
   });
 
@@ -358,7 +439,7 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(422);
     expect(res.body).toEqual({
-      error: "invalid SKU: SKU-999",
+      error: "invalid SKU or UoM mismatch",
     });
   });
 
@@ -395,7 +476,7 @@ describe("PUT /supply/inventory-updates/{receiptAdviceId}", () => {
 
     expect(res.statusCode).toBe(422);
     expect(res.body).toEqual({
-      error: "received quantity exceeds allowed quantity for SKU: SKU-001",
+      error: "received quantity exceeds allowed qty",
     });
   });
 
