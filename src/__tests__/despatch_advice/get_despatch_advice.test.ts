@@ -1,7 +1,19 @@
-import { expect, describe, it } from "vitest";
+import { expect, describe, it, beforeEach, afterAll } from "vitest";
+import { MongoClient } from "mongodb";
 import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
 
-describe.skip("GET /despatch-advice/:despatchAdviceId", () => {
+const client = new MongoClient(process.env.MONGODB_URI!);
+const collection = client.db("test").collection("despatch_advice");
+
+beforeEach(async () => {
+  await collection.deleteMany({});
+});
+
+afterAll(async () => {
+  await client.close();
+});
+
+describe("GET /despatch-advice/:despatchAdviceId", () => {
   it("returns 200 with details for a specific despatch advice doc", async () => {
     const res1 = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     const data1 = res1.body;
