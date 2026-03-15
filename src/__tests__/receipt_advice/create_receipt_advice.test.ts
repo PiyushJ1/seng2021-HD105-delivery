@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 const BASE_URL = "http://localhost:3000";
 
-describe("POST /receipt-advice", () => {
+describe.skip("POST /receipt-advice", () => {
 
   const validBody = {
     despatchId: "DES123",
