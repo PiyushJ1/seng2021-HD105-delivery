@@ -22,7 +22,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("PUT /api/receipt-advice/:receiptAdviceId", () => {
+describe("PUT /api/receipt-advice/:receiptAdviceId", () => {
   it("updates receipt advice doc details for a valid request and returns 200", async () => {
     const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
