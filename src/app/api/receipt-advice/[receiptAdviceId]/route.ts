@@ -29,8 +29,6 @@ export async function PUT(
     );
   }
 
-  console.log("DEBUG - Route hit! ID:", receiptAdviceId, "Payload:", body);
-
   if (
     !body.items ||
     !Array.isArray(body.items) ||
