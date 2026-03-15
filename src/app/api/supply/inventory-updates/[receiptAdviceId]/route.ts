@@ -27,6 +27,28 @@ type InventoryDocument = {
   updatedAt: string;
 };
 
+const NOT_FOUND =
+  "receipt advice ID, warehouse ID or bin ID not found" as const;
+
+/** RFC 4122 UUID (any version). */
+function isValidUuid(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    id.trim(),
+  );
+}
+
+/** Looks like a UUID shape (8-4-4-4-12 hex) but may be invalid. */
+function looksLikeUuid(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    id.trim(),
+  );
+}
+
+function toIsoSecondZ(d: Date): string {
+  const s = d.toISOString();
+  return s.includes(".") ? `${s.slice(0, s.indexOf("."))}Z` : s;
+}
+
 function normaliseLines(lines: InventoryAdjustmentLine[]): InventoryAdjustmentLine[] {
   const merged = new Map<string, InventoryAdjustmentLine>();
 
@@ -48,7 +70,7 @@ function normaliseLines(lines: InventoryAdjustmentLine[]): InventoryAdjustmentLi
   return [...merged.values()];
 }
 
-// PUT /supply/inventory-updates/[receiptAdviceId]
+// PUT /supply/inventory-updates/{receiptAdviceId}
 export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ receiptAdviceId: string }> },
@@ -76,13 +98,18 @@ export async function PUT(
     );
   }
 
-  const { receiptAdviceId } = await context.params;
+  const { receiptAdviceId: receiptAdviceIdParam } = await context.params;
+  const receiptAdviceId = receiptAdviceIdParam?.trim() ?? "";
 
-  if (!receiptAdviceId?.trim()) {
+  if (!receiptAdviceId) {
     return NextResponse.json(
       { error: "missing receiptAdviceId" },
       { status: 400 },
     );
+  }
+
+  if (looksLikeUuid(receiptAdviceId) && !isValidUuid(receiptAdviceId)) {
+    return NextResponse.json({ error: "bad UUID format" }, { status: 400 });
   }
 
   let body: {
@@ -95,7 +122,7 @@ export async function PUT(
     body = await req.json();
   } catch {
     return NextResponse.json(
-      { error: "invalid JSON body" },
+      { error: "Invalid or missing fields" },
       { status: 400 },
     );
   }
@@ -111,27 +138,29 @@ export async function PUT(
     );
   }
 
+  if (looksLikeUuid(warehouseId) && !isValidUuid(warehouseId)) {
+    return NextResponse.json({ error: "bad UUID format" }, { status: 400 });
+  }
+
   if (!binId) {
-    return NextResponse.json(
-      { error: "missing binId" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "missing binId" }, { status: 400 });
+  }
+
+  if (looksLikeUuid(binId) && !isValidUuid(binId)) {
+    return NextResponse.json({ error: "bad UUID format" }, { status: 400 });
   }
 
   if (
     !Array.isArray(inventoryAdjustmentLines) ||
     inventoryAdjustmentLines.length === 0
   ) {
-    return NextResponse.json(
-      { error: "inventoryAdjustmentLines must be a non-empty array" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "empty lines" }, { status: 400 });
   }
 
   for (const line of inventoryAdjustmentLines) {
     if (!line?.sku?.trim()) {
       return NextResponse.json(
-        { error: "Each inventoryAdjustmentLine must include a sku" },
+        { error: "Invalid or missing fields" },
         { status: 400 },
       );
     }
@@ -142,17 +171,14 @@ export async function PUT(
       !Number.isFinite(line.quantityReceived)
     ) {
       return NextResponse.json(
-        {
-          error:
-            "Each inventoryAdjustmentLine must include a valid quantityReceived",
-        },
+        { error: "Invalid or missing fields" },
         { status: 400 },
       );
     }
 
     if (line.quantityReceived < 0) {
       return NextResponse.json(
-        { error: "quantityReceived cannot be negative" },
+        { error: "negative quantityReceived" },
         { status: 400 },
       );
     }
@@ -175,19 +201,16 @@ export async function PUT(
   const inventory = db.collection<InventoryDocument>("inventory");
 
   const receiptAdvice = await receiptAdvices.findOne({
-    receiptAdviceId: receiptAdviceId.trim(),
+    receiptAdviceId,
   });
 
   if (!receiptAdvice) {
-    return NextResponse.json(
-      { error: "receipt advice ID not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: NOT_FOUND }, { status: 404 });
   }
 
   if (receiptAdvice.inventoryUpdateApplied) {
     return NextResponse.json(
-      { error: "receipt advice already applied" },
+      { error: "receipt already applied" },
       { status: 409 },
     );
   }
@@ -207,18 +230,12 @@ export async function PUT(
 
   const warehouse = await warehouses.findOne({ warehouseId });
   if (!warehouse) {
-    return NextResponse.json(
-      { error: "warehouse ID not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: NOT_FOUND }, { status: 404 });
   }
 
   const bin = await bins.findOne({ warehouseId, binId });
   if (!bin) {
-    return NextResponse.json(
-      { error: "bin ID not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: NOT_FOUND }, { status: 404 });
   }
 
   const receiptLines = normaliseLines(
@@ -239,33 +256,30 @@ export async function PUT(
 
     if (!receiptLine) {
       return NextResponse.json(
-        { error: `invalid SKU: ${line.sku}` },
+        { error: "invalid SKU or UoM mismatch" },
         { status: 422 },
       );
     }
 
     if (line.uom && receiptLine.uom && line.uom !== receiptLine.uom) {
       return NextResponse.json(
-        { error: `UoM mismatch for SKU: ${line.sku}` },
+        { error: "invalid SKU or UoM mismatch" },
         { status: 422 },
       );
     }
 
     if (line.quantityReceived > receiptLine.quantityReceived) {
       return NextResponse.json(
-        {
-          error: `received quantity exceeds allowed quantity for SKU: ${line.sku}`,
-        },
+        { error: "received quantity exceeds allowed qty" },
         { status: 422 },
       );
     }
   }
 
-  const appliedAt = new Date().toISOString();
   const positionsUpdated: InventoryDocument[] = [];
 
   for (const line of requestLines) {
-    const updatedAt = new Date().toISOString();
+    const updatedAtZ = toIsoSecondZ(new Date());
 
     await inventory.updateOne(
       {
@@ -282,7 +296,7 @@ export async function PUT(
           available: 0,
         },
         $set: {
-          updatedAt,
+          updatedAt: updatedAtZ,
           ...(line.uom ? { uom: line.uom } : {}),
         },
         $inc: {
@@ -307,17 +321,21 @@ export async function PUT(
         uom: updatedRow.uom,
         onHand: updatedRow.onHand,
         available: updatedRow.available,
-        updatedAt: updatedRow.updatedAt,
+        updatedAt: updatedRow.updatedAt.includes(".")
+          ? `${updatedRow.updatedAt.slice(0, updatedRow.updatedAt.indexOf("."))}Z`
+          : String(updatedRow.updatedAt),
       });
     }
   }
 
+  const appliedAtFormatted = toIsoSecondZ(new Date());
+
   await receiptAdvices.updateOne(
-    { receiptAdviceId: receiptAdviceId.trim() },
+    { receiptAdviceId },
     {
       $set: {
         inventoryUpdateApplied: true,
-        inventoryUpdateAppliedAt: appliedAt,
+        inventoryUpdateAppliedAt: appliedAtFormatted,
         appliedWarehouseId: warehouseId,
         appliedBinId: binId,
       },
@@ -326,9 +344,9 @@ export async function PUT(
 
   return NextResponse.json(
     {
-      receiptAdviceId: receiptAdviceId.trim(),
+      receiptAdviceId,
       applied: true,
-      appliedAt,
+      appliedAt: appliedAtFormatted,
       positionsUpdated,
     },
     { status: 200 },
