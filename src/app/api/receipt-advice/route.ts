@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const db = client.db(
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
       ? "test"
-      : "production"
+      : "production",
   );
 
   const receiptCollection = db.collection("receipt_advice");
@@ -36,12 +36,12 @@ export async function POST(req: NextRequest) {
     !body.items.every(
       (item) =>
         typeof item.productId === "string" &&
-        typeof item.quantityReceived === "number"
+        typeof item.quantityReceived === "number",
     )
   ) {
     return NextResponse.json(
       { error: "Invalid or missing fields" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   if (!despatchDoc || !Array.isArray(despatchDoc.items)) {
     return NextResponse.json(
       { error: "Despatch not found or invalid despatch data" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -63,18 +63,18 @@ export async function POST(req: NextRequest) {
   if (existingReceipt) {
     return NextResponse.json(
       { error: "Duplicate receipt advice" },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
   const totalItemsReceived = body.items.reduce(
     (sum, item) => sum + item.quantityReceived,
-    0
+    0,
   );
 
   const totalItemsDespatched = despatchDoc.items.reduce(
     (sum: number, item: any) => sum + (item.quantity || 0),
-    0
+    0,
   );
 
   const status =
@@ -98,6 +98,6 @@ export async function POST(req: NextRequest) {
       status,
       totalItemsReceived,
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
