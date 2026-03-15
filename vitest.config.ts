@@ -4,5 +4,7 @@ import { loadEnv } from "vite";
 export default defineConfig(({ mode }) => ({
   test: {
     env: loadEnv(mode, process.cwd(), ""),
+    fileParallelism: false,
+    maxWorkers: 1,
   },
 }));
