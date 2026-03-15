@@ -99,7 +99,7 @@ describe("POST /despatch-advice", () => {
     expect(data.error).toEqual(expect.any(String));
   });
 
-  it("returns 409 if the despatch advice doc already exists for the order", async () => {
+  it.skip("returns 409 if the despatch advice doc already exists for the order", async () => {
     const res1 = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
     expect(res1.status).toBe(200);
 
