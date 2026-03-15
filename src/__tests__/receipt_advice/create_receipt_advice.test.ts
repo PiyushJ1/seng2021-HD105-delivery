@@ -1,9 +1,5 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
-import { 
-  api, 
-  DESPATCH_ENDPOINT, 
-  VALID_DESPATCH_REQUEST 
-} from "../utils";
+import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
 import { MongoClient } from "mongodb";
 
 const RECEIPT_ENDPOINT = "/api/receipt-advice";
@@ -24,7 +20,9 @@ afterAll(async () => {
 
 describe("POST /api/receipt-advice", () => {
   it("Creates receipt advice successfully", async () => {
-    const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const despatchRes = await api
+      .post(DESPATCH_ENDPOINT)
+      .send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
 
     const req = {
@@ -48,16 +46,16 @@ describe("POST /api/receipt-advice", () => {
   });
 
   it("Calculates totalItemsReceived and Partial status correctly", async () => {
-    const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const despatchRes = await api
+      .post(DESPATCH_ENDPOINT)
+      .send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
 
     const req = {
       despatchId: despatchId,
       deliveryPartyId: "abc123",
       receivedDate: "2026-03-01",
-      items: [
-        { productId: "prod1", quantityReceived: 5 },
-      ],
+      items: [{ productId: "prod1", quantityReceived: 5 }],
     };
 
     const res = await api.post(RECEIPT_ENDPOINT).send(req);
@@ -82,9 +80,7 @@ describe("POST /api/receipt-advice", () => {
       despatchId: "NON_EXISTENT_DESPATCH_ID",
       deliveryPartyId: "abc123",
       receivedDate: "2026-03-01",
-      items: [
-        { productId: "prod1", quantityReceived: 10 },
-      ],
+      items: [{ productId: "prod1", quantityReceived: 10 }],
     };
 
     const res = await api.post(RECEIPT_ENDPOINT).send(req);
@@ -93,16 +89,16 @@ describe("POST /api/receipt-advice", () => {
   });
 
   it("Returns 409 for duplicate receipt advice", async () => {
-    const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const despatchRes = await api
+      .post(DESPATCH_ENDPOINT)
+      .send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
 
     const req = {
       despatchId: despatchId,
       deliveryPartyId: "abc123",
       receivedDate: "2026-03-01",
-      items: [
-        { productId: "prod1", quantityReceived: 10 },
-      ],
+      items: [{ productId: "prod1", quantityReceived: 10 }],
     };
 
     await api.post(RECEIPT_ENDPOINT).send(req);
