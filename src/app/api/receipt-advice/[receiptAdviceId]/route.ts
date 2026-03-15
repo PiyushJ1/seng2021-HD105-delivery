@@ -1,10 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import clientPromise from "@/src/lib/mongodb";
-
-type ReceiptItem = {
-  productId: string;
-  quantityReceived: number;
-};
+import { ReceiptItem } from "@/src/types";
 
 export async function PUT(
     req: NextRequest,

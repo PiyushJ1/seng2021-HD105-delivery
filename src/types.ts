@@ -10,3 +10,8 @@ export type DespatchItem = {
   productId: string;
   quantity: number;
 };
+
+export type ReceiptItem = {
+  productId: string;
+  quantityReceived: number;
+};
