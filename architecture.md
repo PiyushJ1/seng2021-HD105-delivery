@@ -2,7 +2,7 @@
 
 ## 1. System Overview
 
-To address the business problem of fragmented logistics tracking, we have designed a centralized API that orchestrates the flow between Suppliers and Recipients.
+To address the business problem of fragmented logistics tracking, we have designed a centralised API that orchestrates the flow between Suppliers and Recipients.
 
 ## 2. Container Diagram (SC4 Notation)
 
@@ -23,4 +23,3 @@ graph TB
   Supplier -- "Submit Despatch Advice" --> API
   Recipient -- "Submit Receipt Advice" --> API
   API -- "Validate & Save" --> DB
-```
