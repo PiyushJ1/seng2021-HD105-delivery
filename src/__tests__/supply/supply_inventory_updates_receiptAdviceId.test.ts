@@ -17,7 +17,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("PUT /api/supply/inventory-updates/{receiptAdviceId}", () => {
+describe("PUT /api/supply/inventory-updates/{receiptAdviceId}", () => {
   it("Returns 401 if auth token is missing", async () => {
     const res = await api.put(`${BASE_URL}/RA-TEST-401`).send({
       warehouseId: "W-1",
