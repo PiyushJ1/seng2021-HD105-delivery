@@ -15,7 +15,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("GET /api/fulfilment-cancellation/[fulfilmentCancelationId]", () => {
+describe("GET /api/fulfilment-cancellation/[fulfilmentCancelationId]", () => {
   it("returns 400 when the ID is whitespace or empty", async () => {
     const res = await api.get(`${BASE_URL}/%20%20`);
     expect(res.status).toBe(400);
