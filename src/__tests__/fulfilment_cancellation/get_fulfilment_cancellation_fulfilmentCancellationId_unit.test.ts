@@ -72,7 +72,6 @@ describe("GET /api/fulfilment-cancellation/[fulfilmentCancelationId]", () => {
 
   it("returns 200 and handles missing Despatch Advice gracefully", async () => {
     const uniqueId = "FC_NO_DA";
-
     await db.collection("fulfilmentCancellations").insertOne({
       fulfilmentCancellationId: uniqueId,
       despatchAdviceId: "NON_EXISTENT_DA",
