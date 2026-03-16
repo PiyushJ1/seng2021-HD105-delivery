@@ -17,7 +17,8 @@ export function getOpenAPISpec(serverUrl?: string) {
       info: {
         title: "Despatch Advice Generation API",
         version: "1.0.0",
-        description: "API documentation for the despatch and receipt advice routes",
+        description:
+          "API documentation for the despatch and receipt advice routes",
       },
       servers: [
         {
@@ -392,7 +393,7 @@ export function getOpenAPISpec(serverUrl?: string) {
                     schema: { $ref: "#/components/schemas/HealthResponse" },
                     example: {
                       status: "ok",
-                      service: "fulfilment-service",
+                      service: "despatch-service",
                       version: "1.0.0",
                       time: "2026-03-16T10:30:00.000Z",
                     },
@@ -408,7 +409,7 @@ export function getOpenAPISpec(serverUrl?: string) {
                     },
                     example: {
                       status: "degraded",
-                      service: "fulfilment-service",
+                      service: "despatch-service",
                       version: "1.0.0",
                       time: "2026-03-16T10:45:00.000Z",
                       error: "Service unavailable",
@@ -835,7 +836,7 @@ export function getOpenAPISpec(serverUrl?: string) {
             required: ["status", "service", "version", "time"],
             example: {
               status: "ok",
-              service: "fulfilment-service",
+              service: "despatch-service",
               version: "1.0.0",
               time: "2026-03-16T10:30:00.000Z",
             },
@@ -852,7 +853,7 @@ export function getOpenAPISpec(serverUrl?: string) {
             required: ["status", "service", "version", "time", "error"],
             example: {
               status: "degraded",
-              service: "fulfilment-service",
+              service: "despatch-service",
               version: "1.0.0",
               time: "2026-03-16T10:45:00.000Z",
               error: "Service unavailable",
