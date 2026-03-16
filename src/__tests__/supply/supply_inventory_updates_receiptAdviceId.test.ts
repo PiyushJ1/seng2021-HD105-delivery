@@ -339,10 +339,7 @@ describe.skip("PUT /api/supply/inventory-updates/{receiptAdviceId}", () => {
     });
     expect(receipt?.inventoryUpdateApplied).toBe(true);
 
-    const inventoryRows = await db
-      .collection("inventory")
-      .find({})
-      .toArray();
+    const inventoryRows = await db.collection("inventory").find({}).toArray();
     expect(inventoryRows).toHaveLength(2);
   });
 });
