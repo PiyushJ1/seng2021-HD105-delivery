@@ -28,7 +28,7 @@ describe.skip("PUT /supply/inventory-updates/:fulfilmentCancellationId", () => {
     await cancellations.insertOne({
       fulfilmentCancellationId: cancellationId,
       applied: false,
-      items: [{ sku: "SKU-001", quantity: 10 }], 
+      items: [{ sku: "SKU-001", quantity: 10 }],
     });
 
     await inventory.insertOne({
@@ -74,7 +74,7 @@ describe.skip("PUT /supply/inventory-updates/:fulfilmentCancellationId", () => {
     await cancellations.insertOne({
       fulfilmentCancellationId: cancellationId,
       applied: false,
-      items: [{ sku: "SKU-001", quantity: 2 }], 
+      items: [{ sku: "SKU-001", quantity: 2 }],
     });
 
     const res = await api
