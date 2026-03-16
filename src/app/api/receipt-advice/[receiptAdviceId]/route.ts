@@ -92,3 +92,37 @@ export async function PUT(
     { status: 200 },
   );
 }
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ receiptAdviceId: string }> },
+) {
+  const client = await clientPromise;
+  const db = client.db(
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
+      ? "test"
+      : "production",
+  );
+
+  const { receiptAdviceId } = await params;
+  const receipt = await db
+    .collection("receipt_advice")
+    .findOne({ receiptAdviceId });
+
+  if (!receipt) {
+    return NextResponse.json(
+      { error: "Receipt advice not found" },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      receiptAdviceId: receipt.receiptAdviceId,
+      deliveryPartyId: receipt.deliveryPartyId,
+      status: receipt.status,
+      items: receipt.items,
+    },
+    { status: 200 },
+  );
+}
