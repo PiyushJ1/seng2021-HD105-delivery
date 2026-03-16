@@ -16,7 +16,7 @@ import { NextResponse } from "next/server";
  *               $ref: '#/components/schemas/HealthResponse'
  *             example:
  *               status: ok
- *               service: fulfilment-service
+ *               service: despatch-service
  *               version: 1.0.0
  *               time: "2026-03-16T10:30:00.000Z"
  *       503:
@@ -27,7 +27,7 @@ import { NextResponse } from "next/server";
  *               $ref: '#/components/schemas/HealthDegradedErrorResponse'
  *             example:
  *               status: degraded
- *               service: fulfilment-service
+ *               service: despatch-service
  *               version: 1.0.0
  *               time: "2026-03-16T10:45:00.000Z"
  *               error: Service unavailable
@@ -38,7 +38,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "ok",
-        service: "fulfilment-service",
+        service: "despatch-service",
         version: "1.0.0",
         time: new Date().toISOString(),
       },
@@ -48,7 +48,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "degraded",
-        service: "fulfilment-service",
+        service: "despatch-service",
         version: "1.0.0",
         time: new Date().toISOString(),
         error: err instanceof Error ? err.message : "Service unavailable",
