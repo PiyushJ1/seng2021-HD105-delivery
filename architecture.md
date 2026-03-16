@@ -23,3 +23,4 @@ graph TB
   Supplier -- "Submit Despatch Advice" --> API
   Recipient -- "Submit Receipt Advice" --> API
   API -- "Validate & Save" --> DB
+```

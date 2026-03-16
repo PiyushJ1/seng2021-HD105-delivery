@@ -92,6 +92,7 @@ export async function PUT(
     { status: 200 },
   );
 }
+<<<<<<< HEAD
 
 export async function GET(
   req: NextRequest,
@@ -126,3 +127,5 @@ export async function GET(
     { status: 200 },
   );
 }
+=======
+>>>>>>> 08bb310 (fixing lint using npm run prettier)
