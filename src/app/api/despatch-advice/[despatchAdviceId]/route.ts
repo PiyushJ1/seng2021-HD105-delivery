@@ -2,6 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/src/lib/mongodb";
 import { DespatchAdvice } from "@/src/types";
 
+/**
+ * @openapi
+ * /api/despatch-advice/{despatchAdviceId}:
+ *   get:
+ *     tags:
+ *       - Despatch Advice
+ *     summary: Get a despatch advice by ID
+ *     parameters:
+ *       - in: path
+ *         name: despatchAdviceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Despatch advice details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DespatchAdvice'
+ *       404:
+ *         description: Despatch advice not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DespatchAdviceByIdNotFoundError'
+ */
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ despatchAdviceId: string }> },
