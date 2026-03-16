@@ -25,17 +25,19 @@ describe.skip("POST /api/fulfilment-cancellation", () => {
       ],
     });
 
-    const res = await api
-      .post(ENDPOINT)
-      .send({
-        despatchAdviceId: "DES2001",
-        reason: "damaged goods in transit",
-        cancellationDate: "2026-03-01",
-        cancelledItems: [
-          { productId: "prod1", quantityCancelled: 20, reasonCode: "DAMAGED" },
-          { productId: "prod2", quantityCancelled: 10, reasonCode: "CUSTOMER_REQUEST" },
-        ],
-      });
+    const res = await api.post(ENDPOINT).send({
+      despatchAdviceId: "DES2001",
+      reason: "damaged goods in transit",
+      cancellationDate: "2026-03-01",
+      cancelledItems: [
+        { productId: "prod1", quantityCancelled: 20, reasonCode: "DAMAGED" },
+        {
+          productId: "prod2",
+          quantityCancelled: 10,
+          reasonCode: "CUSTOMER_REQUEST",
+        },
+      ],
+    });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
