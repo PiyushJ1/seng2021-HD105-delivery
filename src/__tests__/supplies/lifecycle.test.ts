@@ -25,7 +25,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("PATCH /api/supplies/:supplyId/lifecycle", () => {
+describe("PATCH /api/supplies/:supplyId/lifecycle", () => {
   it("Updates lifecycle state successfully and returns 200", async () => {
     const req = {
       newState: "IN_TRANSIT",
