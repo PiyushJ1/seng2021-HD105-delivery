@@ -19,3 +19,5 @@ export const VALID_DESPATCH_REQUEST = {
     },
   ],
 };
+
+export const SUPPLY_INVENTORY_ENDPOINT = "/api/supply/inventory-updates";
