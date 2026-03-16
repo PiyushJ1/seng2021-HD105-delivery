@@ -39,7 +39,9 @@ export function getOpenAPISpec(serverUrl?: string) {
               required: true,
               content: {
                 "application/json": {
-                  schema: { $ref: "#/components/schemas/DespatchAdviceRequest" },
+                  schema: {
+                    $ref: "#/components/schemas/DespatchAdviceRequest",
+                  },
                 },
               },
             },
@@ -343,7 +345,8 @@ export function getOpenAPISpec(serverUrl?: string) {
         "/api/despatch/receipt-advice/{receiptAdviceId}": {
           get: {
             tags: ["Receipt Advice"],
-            summary: "Get receipt advice details as viewed by despatch workflow",
+            summary:
+              "Get receipt advice details as viewed by despatch workflow",
             parameters: [
               {
                 in: "path",
@@ -354,7 +357,8 @@ export function getOpenAPISpec(serverUrl?: string) {
             ],
             responses: {
               "200": {
-                description: "Receipt advice details with delivery party flattened into each item",
+                description:
+                  "Receipt advice details with delivery party flattened into each item",
                 content: {
                   "application/json": {
                     schema: {
