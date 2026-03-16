@@ -1,9 +1,12 @@
-import path from "node:path";
 import swaggerJSDoc, { type Options } from "swagger-jsdoc";
 
-let cachedSpec: ReturnType<typeof swaggerJSDoc> | null = null;
+const cachedSpecs = new Map<string, ReturnType<typeof swaggerJSDoc>>();
 
-export function getOpenAPISpec() {
+export function getOpenAPISpec(serverUrl?: string) {
+  const resolvedServerUrl =
+    serverUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+  const cachedSpec = cachedSpecs.get(resolvedServerUrl);
   if (cachedSpec) {
     return cachedSpec;
   }
@@ -18,7 +21,7 @@ export function getOpenAPISpec() {
       },
       servers: [
         {
-          url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+          url: resolvedServerUrl,
           description: "Current environment",
         },
       ],
@@ -27,6 +30,392 @@ export function getOpenAPISpec() {
         { name: "Receipt Advice" },
         { name: "Health" },
       ],
+      paths: {
+        "/api/despatch-advice": {
+          post: {
+            tags: ["Despatch Advice"],
+            summary: "Create a despatch advice",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/DespatchAdviceRequest" },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Despatch advice created successfully",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid request body",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateBadRequestError",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "orderId was not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateNotFoundError",
+                    },
+                  },
+                },
+              },
+              "409": {
+                description: "Despatch advice already exists for order",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateConflictError",
+                    },
+                  },
+                },
+              },
+              "422": {
+                description: "Item quantity exceeds inventory",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateUnprocessableError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          get: {
+            tags: ["Despatch Advice"],
+            summary: "Get all despatch advices",
+            responses: {
+              "200": {
+                description: "List of despatch advices",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceListResponse",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/despatch-advice/{despatchAdviceId}": {
+          get: {
+            tags: ["Despatch Advice"],
+            summary: "Get a despatch advice by ID",
+            parameters: [
+              {
+                in: "path",
+                name: "despatchAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            responses: {
+              "200": {
+                description: "Despatch advice details",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/DespatchAdvice" },
+                  },
+                },
+              },
+              "404": {
+                description: "Despatch advice not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceByIdNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/receipt-advice": {
+          get: {
+            tags: ["Receipt Advice"],
+            summary: "Search receipt advices by productId",
+            parameters: [
+              {
+                in: "query",
+                name: "productId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            responses: {
+              "200": {
+                description: "Matching receipt records for product",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/ReceiptAdviceSearchResult",
+                      },
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Missing productId",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceSearchBadRequestError",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "No receipt found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceSearchNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          post: {
+            tags: ["Receipt Advice"],
+            summary: "Create a receipt advice for a despatch",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: "#/components/schemas/ReceiptAdviceCreateRequest",
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Receipt advice created",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceWriteResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid request body",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceCreateBadRequestError",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Despatch not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceCreateNotFoundError",
+                    },
+                  },
+                },
+              },
+              "409": {
+                description: "Duplicate receipt advice for despatch",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceCreateConflictError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/receipt-advice/{receiptAdviceId}": {
+          put: {
+            tags: ["Receipt Advice"],
+            summary: "Update receipt advice items by ID",
+            parameters: [
+              {
+                in: "path",
+                name: "receiptAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: "#/components/schemas/ReceiptAdviceUpdateRequest",
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Receipt advice updated",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceWriteResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid payload",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceUpdateBadRequestError",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Receipt advice or associated despatch not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceUpdateNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          get: {
+            tags: ["Receipt Advice"],
+            summary: "Get receipt advice by ID",
+            parameters: [
+              {
+                in: "path",
+                name: "receiptAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            responses: {
+              "200": {
+                description: "Receipt advice details",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ReceiptAdvice" },
+                  },
+                },
+              },
+              "404": {
+                description: "Receipt advice not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceByIdNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/despatch/receipt-advice/{receiptAdviceId}": {
+          get: {
+            tags: ["Receipt Advice"],
+            summary: "Get receipt advice details as viewed by despatch workflow",
+            parameters: [
+              {
+                in: "path",
+                name: "receiptAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            responses: {
+              "200": {
+                description: "Receipt advice details with delivery party flattened into each item",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceDespatchViewResponse",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Receipt advice not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchReceiptAdviceByIdNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/health": {
+          get: {
+            tags: ["Health"],
+            summary: "Check service health",
+            responses: {
+              "200": {
+                description: "Service is healthy",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/HealthResponse" },
+                    example: {
+                      status: "ok",
+                      service: "fulfilment-service",
+                      version: "1.0.0",
+                      time: "2026-03-16T10:30:00.000Z",
+                    },
+                  },
+                },
+              },
+              "503": {
+                description: "Service is degraded",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/HealthDegradedErrorResponse",
+                    },
+                    example: {
+                      status: "degraded",
+                      service: "fulfilment-service",
+                      version: "1.0.0",
+                      time: "2026-03-16T10:45:00.000Z",
+                      error: "Service unavailable",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       components: {
         schemas: {
           ErrorResponse: {
@@ -468,9 +857,10 @@ export function getOpenAPISpec() {
         },
       },
     },
-    apis: [path.join(process.cwd(), "src/app/api/**/route.ts")],
+    apis: [],
   };
 
-  cachedSpec = swaggerJSDoc(options);
-  return cachedSpec;
+  const generatedSpec = swaggerJSDoc(options);
+  cachedSpecs.set(resolvedServerUrl, generatedSpec);
+  return generatedSpec;
 }
