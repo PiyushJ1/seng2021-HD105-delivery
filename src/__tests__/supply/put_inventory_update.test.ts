@@ -25,11 +25,10 @@ describe.skip("PUT /supply/inventory-updates/:fulfilmentCancellationId", () => {
   };
 
   it("successfully applies inventory updates and returns 200", async () => {
-    // Seed the cancellation and the current inventory position
     await cancellations.insertOne({
       fulfilmentCancellationId: cancellationId,
       applied: false,
-      items: [{ sku: "SKU-001", quantity: 10 }], // SKU must exist in cancellation
+      items: [{ sku: "SKU-001", quantity: 10 }], 
     });
 
     await inventory.insertOne({
@@ -52,8 +51,8 @@ describe.skip("PUT /supply/inventory-updates/:fulfilmentCancellationId", () => {
       positionsUpdated: [
         expect.objectContaining({
           sku: "SKU-001",
-          onHand: 120, // 115 + 5
-          available: 125, // 120 + 5
+          onHand: 120,
+          available: 125,
         }),
       ],
     });
@@ -75,7 +74,7 @@ describe.skip("PUT /supply/inventory-updates/:fulfilmentCancellationId", () => {
     await cancellations.insertOne({
       fulfilmentCancellationId: cancellationId,
       applied: false,
-      items: [{ sku: "SKU-001", quantity: 2 }], // Only 2 allowed
+      items: [{ sku: "SKU-001", quantity: 2 }], 
     });
 
     const res = await api
