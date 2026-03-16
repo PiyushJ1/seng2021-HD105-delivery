@@ -176,18 +176,16 @@ export async function PUT(
     if (existingRow) {
       const newOnHand = (existingRow.onHand ?? 0) + line.quantityReceived;
       const newAvailable = (existingRow.available ?? 0) + line.quantityReceived;
-      await db
-        .collection("inventory")
-        .updateOne(
-          { warehouseId, binId, sku: line.sku },
-          {
-            $set: {
-              onHand: newOnHand,
-              available: newAvailable,
-              updatedAt: appliedAt,
-            },
+      await db.collection("inventory").updateOne(
+        { warehouseId, binId, sku: line.sku },
+        {
+          $set: {
+            onHand: newOnHand,
+            available: newAvailable,
+            updatedAt: appliedAt,
           },
-        );
+        },
+      );
       positionsUpdated.push({
         warehouseId,
         binId,
