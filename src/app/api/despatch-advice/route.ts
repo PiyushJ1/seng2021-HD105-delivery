@@ -15,6 +15,63 @@ async function getInventory(productId: string) {
   return { productId, remainingQuantity: 100 };
 }
 
+/**
+ * @openapi
+ * /api/despatch-advice:
+ *   post:
+ *     tags:
+ *       - Despatch Advice
+ *     summary: Create a despatch advice
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/DespatchAdviceRequest'
+ *     responses:
+ *       200:
+ *         description: Despatch advice created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DespatchAdviceCreateResponse'
+ *       400:
+ *         description: Invalid request body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: orderId was not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: Despatch advice already exists for order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       422:
+ *         description: Item quantity exceeds inventory
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   get:
+ *     tags:
+ *       - Despatch Advice
+ *     summary: Get all despatch advices
+ *     responses:
+ *       200:
+ *         description: List of despatch advices
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DespatchAdviceListResponse'
+ */
+
 export async function POST(req: NextRequest) {
   // setup db connection
   const client = await clientPromise;

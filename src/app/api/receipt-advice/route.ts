@@ -14,6 +14,77 @@ type ReceiptAdviceRequest = {
   items: ReceiptItem[];
 };
 
+/**
+ * @openapi
+ * /api/receipt-advice:
+ *   get:
+ *     tags:
+ *       - Receipt Advice
+ *     summary: Search receipt advices by productId
+ *     parameters:
+ *       - in: query
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Matching receipt records for product
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ReceiptAdviceSearchResult'
+ *       400:
+ *         description: Missing productId
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: No receipt found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   post:
+ *     tags:
+ *       - Receipt Advice
+ *     summary: Create a receipt advice for a despatch
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ReceiptAdviceCreateRequest'
+ *     responses:
+ *       200:
+ *         description: Receipt advice created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReceiptAdviceWriteResponse'
+ *       400:
+ *         description: Invalid request body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Despatch not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: Duplicate receipt advice for despatch
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
 export async function GET(req: NextRequest) {
   const client = await clientPromise;
   const db = client.db(

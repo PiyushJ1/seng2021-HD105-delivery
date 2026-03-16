@@ -1,6 +1,34 @@
 import { NextResponse, NextRequest } from "next/server";
 import clientPromise from "@/src/lib/mongodb";
 
+/**
+ * @openapi
+ * /api/despatch/receipt-advice/{receiptAdviceId}:
+ *   get:
+ *     tags:
+ *       - Receipt Advice
+ *     summary: Get receipt advice details as viewed by despatch workflow
+ *     parameters:
+ *       - in: path
+ *         name: receiptAdviceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Receipt advice details with delivery party flattened into each item
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReceiptAdviceDespatchViewResponse'
+ *       404:
+ *         description: Receipt advice not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ receiptAdviceId: string }> },

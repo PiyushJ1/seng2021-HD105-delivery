@@ -2,6 +2,69 @@ import { NextResponse, NextRequest } from "next/server";
 import clientPromise from "@/src/lib/mongodb";
 import { ReceiptItem } from "@/src/types";
 
+/**
+ * @openapi
+ * /api/receipt-advice/{receiptAdviceId}:
+ *   put:
+ *     tags:
+ *       - Receipt Advice
+ *     summary: Update receipt advice items by ID
+ *     parameters:
+ *       - in: path
+ *         name: receiptAdviceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ReceiptAdviceUpdateRequest'
+ *     responses:
+ *       200:
+ *         description: Receipt advice updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReceiptAdviceWriteResponse'
+ *       400:
+ *         description: Invalid payload
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Receipt advice or associated despatch not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   get:
+ *     tags:
+ *       - Receipt Advice
+ *     summary: Get receipt advice by ID
+ *     parameters:
+ *       - in: path
+ *         name: receiptAdviceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Receipt advice details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReceiptAdvice'
+ *       404:
+ *         description: Receipt advice not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ receiptAdviceId: string }> },

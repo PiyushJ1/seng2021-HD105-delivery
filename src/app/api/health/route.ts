@@ -1,5 +1,37 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/src/lib/mongodb";
+
+/**
+ * @openapi
+ * /api/health:
+ *   get:
+ *     tags:
+ *       - Health
+ *     summary: Check service health
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthResponse'
+ *             example:
+ *               status: ok
+ *               service: fulfilment-service
+ *               version: 1.0.0
+ *               time: "2026-03-16T10:30:00.000Z"
+ *       503:
+ *         description: Service is degraded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthResponse'
+ *             example:
+ *               status: degraded
+ *               service: fulfilment-service
+ *               version: 1.0.0
+ *               time: "2026-03-16T10:45:00.000Z"
+ *               error: Service unavailable
+ */
 
 export async function GET() {
   try {
