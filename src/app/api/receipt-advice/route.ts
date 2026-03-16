@@ -14,6 +14,48 @@ type ReceiptAdviceRequest = {
   items: ReceiptItem[];
 };
 
+export async function GET(req: NextRequest) {
+  const client = await clientPromise;
+  const db = client.db(
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
+      ? "test"
+      : "production"
+  );
+
+  const { searchParams } = new URL(req.url);
+  const productId = searchParams.get("productId");
+
+  if (!productId) {
+    return NextResponse.json(
+      { error: "Missing productId parameter" },
+      { status: 400 }
+    );
+  }
+
+  const receipts = await db
+    .collection("receipt_advice")
+    .find({ "items.productId": productId })
+    .toArray();
+
+  if (receipts.length === 0) {
+    return NextResponse.json(
+      { error: "No receipt found" },
+      { status: 404 }
+    );
+  }
+
+  const response = receipts.map((receipt) => {
+    const item = receipt.items.find((i: any) => i.productId === productId);
+    return {
+      receiptAdviceId: receipt.receiptAdviceId,
+      quantityReceived: item ? item.quantityReceived : 0,
+      receivedDate: receipt.receivedDate,
+    };
+  });
+
+  return NextResponse.json(response, { status: 200 });
+}
+
 export async function POST(req: NextRequest) {
   const client = await clientPromise;
   const db = client.db(
