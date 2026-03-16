@@ -1,8 +1,5 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-- Test commit
-- I'm larry which rhymes with banary
-
 ## Getting Started
 
 First, run the development server:
