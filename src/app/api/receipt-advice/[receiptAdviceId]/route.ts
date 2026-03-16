@@ -33,13 +33,13 @@ import { ReceiptItem } from "@/src/types";
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceUpdateBadRequestError'
  *       404:
  *         description: Receipt advice or associated despatch not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceUpdateNotFoundError'
  *   get:
  *     tags:
  *       - Receipt Advice
@@ -62,7 +62,7 @@ import { ReceiptItem } from "@/src/types";
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceByIdNotFoundError'
  */
 
 export async function PUT(

@@ -24,7 +24,7 @@ import { NextResponse } from "next/server";
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/HealthResponse'
+ *               $ref: '#/components/schemas/HealthDegradedErrorResponse'
  *             example:
  *               status: degraded
  *               service: fulfilment-service

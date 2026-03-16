@@ -39,6 +39,147 @@ export function getOpenAPISpec() {
               error: "Receipt advice not found",
             },
           },
+          DespatchAdviceCreateBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Missing or invalid fields in the request body",
+            },
+          },
+          DespatchAdviceCreateNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "the orderId was not found",
+            },
+          },
+          DespatchAdviceCreateConflictError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Despatch advice doc already exists for this order",
+            },
+          },
+          DespatchAdviceCreateUnprocessableError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "item quantity exceeds the quantity available",
+            },
+          },
+          DespatchAdviceByIdNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error:
+                "No despatch advice was found for the given despatchAdviceId",
+            },
+          },
+          ReceiptAdviceSearchBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Missing productId parameter",
+            },
+          },
+          ReceiptAdviceSearchNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "No receipt found",
+            },
+          },
+          ReceiptAdviceCreateBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Invalid or missing fields",
+            },
+          },
+          ReceiptAdviceCreateNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Despatch not found or invalid despatch data",
+            },
+          },
+          ReceiptAdviceCreateConflictError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Duplicate receipt advice",
+            },
+          },
+          ReceiptAdviceUpdateBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Invalid update data",
+            },
+          },
+          ReceiptAdviceUpdateNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Associated despatch not found",
+            },
+          },
+          ReceiptAdviceByIdNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Receipt advice not found",
+            },
+          },
+          DespatchReceiptAdviceByIdNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Receipt advice not found",
+            },
+          },
           DespatchItem: {
             type: "object",
             properties: {
@@ -304,6 +445,24 @@ export function getOpenAPISpec() {
               service: "fulfilment-service",
               version: "1.0.0",
               time: "2026-03-16T10:30:00.000Z",
+            },
+          },
+          HealthDegradedErrorResponse: {
+            type: "object",
+            properties: {
+              status: { type: "string" },
+              service: { type: "string" },
+              version: { type: "string" },
+              time: { type: "string" },
+              error: { type: "string" },
+            },
+            required: ["status", "service", "version", "time", "error"],
+            example: {
+              status: "degraded",
+              service: "fulfilment-service",
+              version: "1.0.0",
+              time: "2026-03-16T10:45:00.000Z",
+              error: "Service unavailable",
             },
           },
         },

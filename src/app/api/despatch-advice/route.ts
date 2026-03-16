@@ -40,25 +40,25 @@ async function getInventory(productId: string) {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/DespatchAdviceCreateBadRequestError'
  *       404:
  *         description: orderId was not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/DespatchAdviceCreateNotFoundError'
  *       409:
  *         description: Despatch advice already exists for order
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/DespatchAdviceCreateConflictError'
  *       422:
  *         description: Item quantity exceeds inventory
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/DespatchAdviceCreateUnprocessableError'
  *   get:
  *     tags:
  *       - Despatch Advice

@@ -26,7 +26,7 @@ import clientPromise from "@/src/lib/mongodb";
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/DespatchReceiptAdviceByIdNotFoundError'
  */
 
 export async function GET(

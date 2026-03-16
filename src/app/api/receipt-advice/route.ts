@@ -41,13 +41,13 @@ type ReceiptAdviceRequest = {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceSearchBadRequestError'
  *       404:
  *         description: No receipt found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceSearchNotFoundError'
  *   post:
  *     tags:
  *       - Receipt Advice
@@ -70,19 +70,19 @@ type ReceiptAdviceRequest = {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceCreateBadRequestError'
  *       404:
  *         description: Despatch not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceCreateNotFoundError'
  *       409:
  *         description: Duplicate receipt advice for despatch
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ReceiptAdviceCreateConflictError'
  */
 
 export async function GET(req: NextRequest) {
