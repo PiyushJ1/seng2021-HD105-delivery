@@ -15,7 +15,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("POST /api/fulfilment-cancellation", () => {
+describe("POST /api/fulfilment-cancellation", () => {
   it("Creates fulfilment cancellation successfully", async () => {
     await db.collection("despatchAdvices").insertOne({
       despatchAdviceId: "DES2001",
