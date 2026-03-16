@@ -70,7 +70,7 @@ function mockFindOneChain(opts: {
   });
 }
 
-describe.skip("PUT /supply/inventory-updates/{receiptAdviceId} (unit)", () => {
+describe("PUT /supply/inventory-updates/{receiptAdviceId} (unit)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetAuth.mockResolvedValue({ role: "despatch_party" });
