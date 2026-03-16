@@ -3,13 +3,13 @@ import clientPromise from "@/src/lib/mongodb";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ receiptAdviceId: string }> }
+  { params }: { params: Promise<{ receiptAdviceId: string }> },
 ) {
   const client = await clientPromise;
   const db = client.db(
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
       ? "test"
-      : "production"
+      : "production",
   );
 
   const receiptCollection = db.collection("receipt_advice");
@@ -21,7 +21,7 @@ export async function GET(
   if (!receipt) {
     return NextResponse.json(
       { error: "Receipt advice not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -38,6 +38,6 @@ export async function GET(
       status: receipt.status,
       items: itemsWithDeliveryDetails,
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

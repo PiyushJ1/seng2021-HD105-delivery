@@ -3,14 +3,14 @@ import clientPromise from "@/src/lib/mongodb";
 import { ReceiptItem } from "@/src/types";
 
 export async function PUT(
-    req: NextRequest,
-    { params }: { params: Promise<{ receiptAdviceId: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ receiptAdviceId: string }> },
 ) {
   const client = await clientPromise;
   const db = client.db(
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
       ? "test"
-      : "production"
+      : "production",
   );
 
   const receiptCollection = db.collection("receipt_advice");
@@ -18,15 +18,12 @@ export async function PUT(
 
   const resolvedParams = await params;
   const receiptAdviceId = resolvedParams.receiptAdviceId;
-  
+
   let body;
   try {
     body = await req.json();
   } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   if (
@@ -36,13 +33,10 @@ export async function PUT(
     !body.items.every(
       (item: any) =>
         typeof item.productId === "string" &&
-        typeof item.quantityReceived === "number"
+        typeof item.quantityReceived === "number",
     )
   ) {
-    return NextResponse.json(
-      { error: "Invalid update data" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid update data" }, { status: 400 });
   }
 
   const existingReceipt = await receiptCollection.findOne({ receiptAdviceId });
@@ -50,7 +44,7 @@ export async function PUT(
   if (!existingReceipt) {
     return NextResponse.json(
       { error: "Receipt advice not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -61,18 +55,18 @@ export async function PUT(
   if (!despatchDoc) {
     return NextResponse.json(
       { error: "Associated despatch not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
   const totalItemsReceived = body.items.reduce(
     (sum: number, item: ReceiptItem) => sum + item.quantityReceived,
-    0
+    0,
   );
 
   const totalItemsDespatched = despatchDoc.items.reduce(
     (sum: number, item: any) => sum + (item.quantity || 0),
-    0
+    0,
   );
 
   const status =
@@ -86,7 +80,7 @@ export async function PUT(
         totalItemsReceived,
         status,
       },
-    }
+    },
   );
 
   return NextResponse.json(
@@ -95,35 +89,40 @@ export async function PUT(
       status,
       totalItemsReceived,
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
 
 export async function GET(
-    req: NextRequest,
-    { params }: { params: Promise<{ receiptAdviceId: string }> }
-  ) {
-    const client = await clientPromise;
-    const db = client.db(
-      process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
-        ? "test"
-        : "production"
+  req: NextRequest,
+  { params }: { params: Promise<{ receiptAdviceId: string }> },
+) {
+  const client = await clientPromise;
+  const db = client.db(
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
+      ? "test"
+      : "production",
+  );
+
+  const { receiptAdviceId } = await params;
+  const receipt = await db
+    .collection("receipt_advice")
+    .findOne({ receiptAdviceId });
+
+  if (!receipt) {
+    return NextResponse.json(
+      { error: "Receipt advice not found" },
+      { status: 404 },
     );
-  
-    const { receiptAdviceId } = await params;
-    const receipt = await db.collection("receipt_advice").findOne({ receiptAdviceId });
-  
-    if (!receipt) {
-      return NextResponse.json(
-        { error: "Receipt advice not found" },
-        { status: 404 }
-      );
-    }
-  
-    return NextResponse.json({
+  }
+
+  return NextResponse.json(
+    {
       receiptAdviceId: receipt.receiptAdviceId,
       deliveryPartyId: receipt.deliveryPartyId,
       status: receipt.status,
-      items: receipt.items
-    }, { status: 200 });
-  }
+      items: receipt.items,
+    },
+    { status: 200 },
+  );
+}

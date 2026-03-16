@@ -1,9 +1,5 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
-import { 
-  api, 
-  DESPATCH_ENDPOINT, 
-  VALID_DESPATCH_REQUEST 
-} from "../utils";
+import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
 import { MongoClient } from "mongodb";
 
 const RECEIPT_ENDPOINT = "/api/receipt-advice";
@@ -24,16 +20,16 @@ afterAll(async () => {
 
 describe("PUT /api/receipt-advice/:receiptAdviceId", () => {
   it("updates receipt advice doc details for a valid request and returns 200", async () => {
-    const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const despatchRes = await api
+      .post(DESPATCH_ENDPOINT)
+      .send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
 
     const initialReq = {
       despatchId: despatchId,
       deliveryPartyId: "abc123",
       receivedDate: "2026-03-01",
-      items: [
-        { productId: "prod1", quantityReceived: 10 }
-      ],
+      items: [{ productId: "prod1", quantityReceived: 10 }],
     };
     const receiptRes = await api.post(RECEIPT_ENDPOINT).send(initialReq);
     const receiptAdviceId = receiptRes.body.receiptAdviceId;
@@ -41,11 +37,13 @@ describe("PUT /api/receipt-advice/:receiptAdviceId", () => {
     const updateReq = {
       items: [
         { productId: "prod1", quantityReceived: 10 },
-        { productId: "prod2", quantityReceived: 20 }
-      ]
+        { productId: "prod2", quantityReceived: 20 },
+      ],
     };
 
-    const res = await api.put(`${RECEIPT_ENDPOINT}/${receiptAdviceId}`).send(updateReq);
+    const res = await api
+      .put(`${RECEIPT_ENDPOINT}/${receiptAdviceId}`)
+      .send(updateReq);
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
@@ -57,7 +55,7 @@ describe("PUT /api/receipt-advice/:receiptAdviceId", () => {
 
   it("returns 400 for invalid update data", async () => {
     const res = await api.put(`${RECEIPT_ENDPOINT}/ANY_ID`).send({
-      items: "invalid_format_not_an_array"
+      items: "invalid_format_not_an_array",
     });
 
     expect(res.status).toBe(400);
@@ -65,12 +63,12 @@ describe("PUT /api/receipt-advice/:receiptAdviceId", () => {
 
   it("returns 404 if receipt advice not found", async () => {
     const updateReq = {
-      items: [
-        { productId: "prod1", quantityReceived: 80 }
-      ]
+      items: [{ productId: "prod1", quantityReceived: 80 }],
     };
 
-    const res = await api.put(`${RECEIPT_ENDPOINT}/NON_EXISTENT_ID`).send(updateReq);
+    const res = await api
+      .put(`${RECEIPT_ENDPOINT}/NON_EXISTENT_ID`)
+      .send(updateReq);
 
     expect(res.status).toBe(404);
   });
