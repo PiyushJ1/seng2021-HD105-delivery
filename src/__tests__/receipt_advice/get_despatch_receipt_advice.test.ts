@@ -1,9 +1,5 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
-import { 
-  api, 
-  DESPATCH_ENDPOINT, 
-  VALID_DESPATCH_REQUEST 
-} from "../utils";
+import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
 import { MongoClient } from "mongodb";
 
 const RECEIPT_POST_ENDPOINT = "/api/receipt-advice";
@@ -25,7 +21,9 @@ afterAll(async () => {
 
 describe("GET /api/despatch/receipt-advice/:receiptAdviceId", () => {
   it("returns 200 and full details with flattened deliveryPartyId in items", async () => {
-    const despatchRes = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const despatchRes = await api
+      .post(DESPATCH_ENDPOINT)
+      .send(VALID_DESPATCH_REQUEST);
     const despatchId = despatchRes.body.despatchAdviceId;
 
     const deliveryId = "DEL_PARTY_789";
@@ -35,10 +33,10 @@ describe("GET /api/despatch/receipt-advice/:receiptAdviceId", () => {
       receivedDate: "2026-03-16",
       items: [
         { productId: "prod1", quantityReceived: 5 },
-        { productId: "prod2", quantityReceived: 10 }
+        { productId: "prod2", quantityReceived: 10 },
       ],
     };
-    
+
     const setupRes = await api.post(RECEIPT_POST_ENDPOINT).send(receiptReq);
     const receiptAdviceId = setupRes.body.receiptAdviceId;
 
@@ -53,14 +51,14 @@ describe("GET /api/despatch/receipt-advice/:receiptAdviceId", () => {
         expect.objectContaining({
           productId: "prod1",
           deliveryPartyId: deliveryId,
-          quantityReceived: 5
+          quantityReceived: 5,
         }),
         expect.objectContaining({
           productId: "prod2",
           deliveryPartyId: deliveryId,
-          quantityReceived: 10
-        })
-      ])
+          quantityReceived: 10,
+        }),
+      ]),
     });
   });
 

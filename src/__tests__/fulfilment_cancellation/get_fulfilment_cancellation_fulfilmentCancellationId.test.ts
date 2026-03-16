@@ -30,11 +30,11 @@ describe.skip("GET /api/fulfilment-cancellation/[id]", () => {
 
   it("Returns 200 and fetches data successfully", async () => {
     const uniqueId = "FC_12345";
-    
+
     await db.collection("despatchAdvices").insertOne({
       despatchAdviceId: "DA_JOIN",
       supplierPartyId: "SUPP1",
-      deliveryPartyId: "DELIV1"
+      deliveryPartyId: "DELIV1",
     });
 
     await db.collection("fulfilmentCancellations").insertOne({
@@ -43,7 +43,7 @@ describe.skip("GET /api/fulfilment-cancellation/[id]", () => {
       status: "Created",
       cancellationDate: "2026-03-10",
       reason: "Damaged Items",
-      cancelledItems: [{ productId: "p1", quantityCancelled: 5 }]
+      cancelledItems: [{ productId: "p1", quantityCancelled: 5 }],
     });
 
     const res = await api.get(`${BASE_URL}/${uniqueId}`);

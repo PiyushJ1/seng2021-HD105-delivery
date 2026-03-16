@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const db = client.db(
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
       ? "test"
-      : "production"
+      : "production",
   );
 
   const { searchParams } = new URL(req.url);
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   if (!productId) {
     return NextResponse.json(
       { error: "Missing productId parameter" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -38,10 +38,7 @@ export async function GET(req: NextRequest) {
     .toArray();
 
   if (receipts.length === 0) {
-    return NextResponse.json(
-      { error: "No receipt found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "No receipt found" }, { status: 404 });
   }
 
   const response = receipts.map((receipt) => {
