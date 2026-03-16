@@ -16,7 +16,7 @@ graph TB
   end
 
   subgraph "System Containers"
-    API["Fulfilment API (Node.js/Express) <br/> Logic for validation and state transitions"]
+    API["Fulfilment API (Node.js) <br/> Logic for validation and state transitions"]
     DB[("Database (MongoDB) <br/> Stores Despatch/Receipt Documents")]
   end
 
