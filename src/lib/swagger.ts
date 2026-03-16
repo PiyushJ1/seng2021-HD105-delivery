@@ -15,9 +15,9 @@ export function getOpenAPISpec(serverUrl?: string) {
     definition: {
       openapi: "3.0.0",
       info: {
-        title: "Fulfilment Service API",
+        title: "Despatch Advice Generation API",
         version: "1.0.0",
-        description: "API documentation for despatch and receipt advice routes",
+        description: "API documentation for the despatch and receipt advice routes",
       },
       servers: [
         {
