@@ -51,17 +51,17 @@ export async function PUT(
   };
 
   if (!warehouseId) {
-    return NextResponse.json(
-      { error: "missing warehouseId" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "missing warehouseId" }, { status: 400 });
   }
 
   if (!binId) {
     return NextResponse.json({ error: "missing binId" }, { status: 400 });
   }
 
-  if (!Array.isArray(inventoryAdjustmentLines) || inventoryAdjustmentLines.length === 0) {
+  if (
+    !Array.isArray(inventoryAdjustmentLines) ||
+    inventoryAdjustmentLines.length === 0
+  ) {
     return NextResponse.json({ error: "empty lines" }, { status: 400 });
   }
 
@@ -83,10 +83,7 @@ export async function PUT(
   if (UUID_V4_RE.test(warehouseId) === false && warehouseId.includes("-")) {
     const parts = warehouseId.split("-");
     if (parts.length === 5) {
-      return NextResponse.json(
-        { error: "bad UUID format" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "bad UUID format" }, { status: 400 });
     }
   }
 
@@ -122,12 +119,8 @@ export async function PUT(
     );
   }
 
-  const warehouse = await db
-    .collection("warehouses")
-    .findOne({ warehouseId });
-  const bin = await db
-    .collection("bins")
-    .findOne({ warehouseId, binId });
+  const warehouse = await db.collection("warehouses").findOne({ warehouseId });
+  const bin = await db.collection("bins").findOne({ warehouseId, binId });
 
   if (!warehouse || !bin) {
     return NextResponse.json(
@@ -183,10 +176,18 @@ export async function PUT(
     if (existingRow) {
       const newOnHand = (existingRow.onHand ?? 0) + line.quantityReceived;
       const newAvailable = (existingRow.available ?? 0) + line.quantityReceived;
-      await db.collection("inventory").updateOne(
-        { warehouseId, binId, sku: line.sku },
-        { $set: { onHand: newOnHand, available: newAvailable, updatedAt: appliedAt } },
-      );
+      await db
+        .collection("inventory")
+        .updateOne(
+          { warehouseId, binId, sku: line.sku },
+          {
+            $set: {
+              onHand: newOnHand,
+              available: newAvailable,
+              updatedAt: appliedAt,
+            },
+          },
+        );
       positionsUpdated.push({
         warehouseId,
         binId,
@@ -218,10 +219,9 @@ export async function PUT(
     }
   }
 
-  await db.collection("receiptAdvices").updateOne(
-    { receiptAdviceId },
-    { $set: { inventoryUpdateApplied: true } },
-  );
+  await db
+    .collection("receiptAdvices")
+    .updateOne({ receiptAdviceId }, { $set: { inventoryUpdateApplied: true } });
 
   return NextResponse.json({
     receiptAdviceId,
