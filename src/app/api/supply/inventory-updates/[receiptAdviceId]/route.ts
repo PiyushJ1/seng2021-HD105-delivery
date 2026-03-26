@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuth } from "@/src/lib/auth";
 
 const UUID_V4_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -20,20 +19,6 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ receiptAdviceId: string }> },
 ) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) {
-    return NextResponse.json({ error: "missing auth token" }, { status: 401 });
-  }
-
-  const auth = await getAuth(req);
-  if (!auth) {
-    return NextResponse.json({ error: "missing auth token" }, { status: 401 });
-  }
-
-  if (auth.role !== "despatch_party") {
-    return NextResponse.json({ error: "Not authorised" }, { status: 403 });
-  }
-
   let body: Record<string, unknown>;
   try {
     body = await req.json();
