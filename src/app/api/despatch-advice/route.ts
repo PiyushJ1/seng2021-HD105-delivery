@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { randomUUID } from "crypto";
 import { DespatchAdviceRequest } from "@/src/types";
 import clientPromise from "@/src/lib/mongodb";
+import { getAuth, requireAuth } from "@/src/lib/auth";
+import { headers } from "next/headers";
 
 // mock fetching order for now
 // TODO: fetch the actual order
@@ -149,6 +151,12 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
+  const headerList = await headers();
+  const apiKey = headerList.get("apiKey") as string;
+
+  const auth = await requireAuth(apiKey, { roles: ["despatch"] });
+  if (!auth.ok) return auth.response;
+
   // setup db connection
   const client = await clientPromise;
   const db = client.db(
