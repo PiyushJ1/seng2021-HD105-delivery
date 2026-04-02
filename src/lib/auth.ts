@@ -1,14 +1,13 @@
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import clientPromise from "@/src/lib/mongodb";
 
 interface AuthResult {
   userId: string;
-  role: "delivery_party" | "despatch_party";
+  role: "delivery" | "despatch";
   partyId: string;
 }
 
-export async function getAuth(req: NextRequest): Promise<AuthResult | null> {
-  const apiKey = req.headers.get("x-api-key");
+export async function getAuth(apiKey: string): Promise<AuthResult | null> {
   if (!apiKey) return null;
 
   const client = await clientPromise;
@@ -22,9 +21,42 @@ export async function getAuth(req: NextRequest): Promise<AuthResult | null> {
     return null;
   }
 
+  if (user.role !== "delivery" && user.role !== "despatch") {
+    return null;
+  }
+
   return {
-    userId: user.userId ?? user.email,
+    userId: user.email,
     role: user.role,
     partyId: user.partyId,
   };
+}
+
+export async function requireAuth(
+  apiKey: string,
+  options?: { roles?: Array<"delivery" | "despatch"> },
+) {
+  const auth = await getAuth(apiKey);
+
+  if (!auth) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "Missing or invalid authentication token" },
+        { status: 401 },
+      ),
+    };
+  }
+
+  if (options?.roles && !options.roles.includes(auth.role)) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "Insufficient permissions for this operation" },
+        { status: 403 },
+      ),
+    };
+  }
+
+  return { ok: true, auth };
 }
