@@ -31,17 +31,16 @@ export async function POST(req: NextRequest) {
   const user = await collection.findOne({ email: email });
   const tempApiKey = randomUUID();
 
-  const res = {
-    message: "logged in successfully!",
-    apiKey: tempApiKey,
-  };
-
   if (user && user.password === password) {
     await collection.updateOne(
       { email: email },
       { $set: { apiKey: tempApiKey } }, // set a new field containing the api key
     );
-    return NextResponse.json(res);
+
+    return NextResponse.json({
+      message: "Logged in successfully!",
+      apiKey: tempApiKey,
+    });
   }
 
   return NextResponse.json(
