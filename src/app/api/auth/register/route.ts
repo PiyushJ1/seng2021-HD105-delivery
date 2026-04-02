@@ -1,4 +1,5 @@
 import clientPromise from "@/src/lib/mongodb";
+import { randomUUID } from "crypto";
 import { NextResponse, NextRequest } from "next/server";
 import validator from "validator";
 
@@ -48,9 +49,10 @@ export async function POST(req: NextRequest) {
 
   // register new user (save to db)
   await collection.insertOne({
+    partyId: randomUUID(),
+    role,
     email,
     password,
-    role,
   });
 
   return NextResponse.json(
