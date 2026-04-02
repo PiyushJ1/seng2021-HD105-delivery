@@ -6,7 +6,9 @@ import clientPromise from "@/src/lib/mongodb";
 // mock fetching order for now
 // TODO: fetch the actual order
 async function getOrder(orderId: string) {
-  return orderId === "abc123" ? { orderId } : null;
+  return orderId === "abc123" || orderId === "xyz123" || orderId === "qwerty999"
+    ? { orderId }
+    : null;
 }
 
 // mock getting the inventory for a product given its ID
