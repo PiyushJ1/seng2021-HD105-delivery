@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const user = await collection.findOne({ email: email });
   const tempApiKey = randomUUID();
 
-  if (user && user.password === password) {
+  if (user?.password === password) {
     await collection.updateOne(
       { email: email },
       { $set: { apiKey: tempApiKey } }, // set a new field containing the api key
