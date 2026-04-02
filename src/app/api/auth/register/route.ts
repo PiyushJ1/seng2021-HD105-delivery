@@ -1,7 +1,6 @@
 import clientPromise from "@/src/lib/mongodb";
 import { NextResponse, NextRequest } from "next/server";
 import validator from "validator";
-import { randomUUID } from "crypto";
 
 export async function POST(req: NextRequest) {
   const client = await clientPromise;
@@ -43,7 +42,7 @@ export async function POST(req: NextRequest) {
   if (existingUser) {
     return NextResponse.json(
       { error: "A user is already registered with this email" },
-      { status: 404 },
+      { status: 409 },
     );
   }
 
@@ -54,5 +53,8 @@ export async function POST(req: NextRequest) {
     role,
   });
 
-  return NextResponse.json({ message: "success!" });
+  return NextResponse.json(
+    { message: "Account registered successfully!" },
+    { status: 201 },
+  );
 }
