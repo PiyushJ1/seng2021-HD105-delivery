@@ -49,7 +49,6 @@ export async function POST(req: NextRequest) {
 
   // register new user (save to db)
   await collection.insertOne({
-    userId: randomUUID(),
     email,
     password,
     role,
