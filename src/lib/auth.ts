@@ -16,6 +16,7 @@ export async function getAuth(apiKey: string): Promise<AuthResult | null> {
   );
   const users = db.collection("users");
 
+  // find the user associated with the api key
   const user = await users.findOne({ apiKey });
   if (!user) {
     return null;
@@ -25,6 +26,7 @@ export async function getAuth(apiKey: string): Promise<AuthResult | null> {
     return null;
   }
 
+  // return auth details containing userId, role, and partyId
   return {
     userId: user.email,
     role: user.role,
@@ -42,17 +44,19 @@ export async function requireAuth(
     return {
       ok: false,
       response: NextResponse.json(
-        { error: "Missing or invalid authentication token" },
+        { error: "Missing/invalid authentication token" },
         { status: 401 },
       ),
     };
   }
 
+  // if the options.roles array exists and does not include the
+  // required role for the operation, forbid access
   if (options?.roles && !options.roles.includes(auth.role)) {
     return {
       ok: false,
       response: NextResponse.json(
-        { error: "Insufficient permissions for this operation" },
+        { error: "Accessing this endpoint is unauthorised" },
         { status: 403 },
       ),
     };
