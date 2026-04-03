@@ -151,11 +151,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const headerList = await headers();
-  const apiKey = headerList.get("apiKey") as string;
+  // const headerList = await headers();
+  // const apiKey = headerList.get("apiKey") as string;
 
-  const auth = await requireAuth(apiKey, { roles: ["despatch"] });
-  if (!auth.ok) return auth.response;
+  // const auth = await requireAuth(apiKey, { roles: ["despatch"] });
+  // if (!auth.ok) return auth.response;
 
   // setup db connection
   const client = await clientPromise;
