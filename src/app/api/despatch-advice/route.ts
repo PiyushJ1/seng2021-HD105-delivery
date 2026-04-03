@@ -81,7 +81,9 @@ export async function POST(req: NextRequest) {
     req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
     "";
 
-  const authResult = await requireAuth(apiKey, { roles: ["despatch"] });
+  const authResult = await requireAuth(apiKey, {
+    roles: ["despatch", "delivery"],
+  });
   if (!authResult.ok) return authResult.response;
   const despatchAuth = authResult.auth!;
 
