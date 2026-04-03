@@ -28,10 +28,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const user = await collection.findOne({ email: email });
-  const tempApiKey = randomUUID();
+  const user = await collection.findOne({ email });
+  if (!user || user.password !== password) {
+    return NextResponse.json(
+      { message: "Incorrect email or password" },
+      { status: 404 },
+    );
+  }
 
-  if (user?.password === password) {
+  // check if apiKey doesnt already exist for the user
+  if (!user.apiKey) {
+    const tempApiKey = randomUUID();
+
     await collection.updateOne(
       { email: email },
       { $set: { apiKey: tempApiKey } }, // set a new field containing the api key
@@ -43,8 +51,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  return NextResponse.json(
-    { message: "Failed to log in. Try again." },
-    { status: 401 },
-  );
+  return NextResponse.json({
+    message: "You are already logged in.",
+    apiKey: user.apiKey,
+  });
 }
