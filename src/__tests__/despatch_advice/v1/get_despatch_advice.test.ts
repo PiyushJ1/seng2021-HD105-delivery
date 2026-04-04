@@ -1,6 +1,6 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
 import { MongoClient } from "mongodb";
-import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
+import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../../utils";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const collection = client.db("test").collection("despatch_advice");

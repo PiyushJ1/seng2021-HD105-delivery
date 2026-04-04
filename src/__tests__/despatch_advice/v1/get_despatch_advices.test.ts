@@ -1,5 +1,5 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
-import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../utils";
+import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../../utils";
 import { MongoClient } from "mongodb";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
