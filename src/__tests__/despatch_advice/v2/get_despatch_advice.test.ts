@@ -1,6 +1,6 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
 import { MongoClient } from "mongodb";
-import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../../utils";
+import { api, DESPATCH_ENDPOINT_V2, VALID_DESPATCH_REQUEST } from "../../utils";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db("test");
@@ -35,13 +35,13 @@ describe("GET /despatch-advice/:despatchAdviceId", () => {
   it("returns 200 with details for a specific despatch advice doc", async () => {
     const apiKey = await login();
     const res1 = await api
-      .post(DESPATCH_ENDPOINT)
+      .post(DESPATCH_ENDPOINT_V2)
       .set({ apiKey })
       .send(VALID_DESPATCH_REQUEST);
     const data1 = res1.body;
 
     const res2 = await api.get(
-      `${DESPATCH_ENDPOINT}/${data1.despatchAdviceId}`,
+      `${DESPATCH_ENDPOINT_V2}/${data1.despatchAdviceId}`,
     );
     const data2 = res2.body;
 
@@ -64,7 +64,7 @@ describe("GET /despatch-advice/:despatchAdviceId", () => {
   });
 
   it("returns 404 if no despatch advice was found for the given id", async () => {
-    const res = await api.get(`${DESPATCH_ENDPOINT}/zzzzz111111`);
+    const res = await api.get(`${DESPATCH_ENDPOINT_V2}/zzzzz111111`);
     const data = res.body;
 
     expect(res.status).toBe(404);

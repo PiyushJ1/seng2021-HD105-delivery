@@ -1,5 +1,5 @@
 import { expect, describe, it, beforeEach, afterAll } from "vitest";
-import { api, DESPATCH_ENDPOINT, VALID_DESPATCH_REQUEST } from "../../utils";
+import { api, DESPATCH_ENDPOINT_V2, VALID_DESPATCH_REQUEST } from "../../utils";
 import { MongoClient } from "mongodb";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
@@ -51,7 +51,7 @@ describe("POST /despatch-advice", () => {
     const { headers, partyId } = await authHeaders();
 
     const res = await api
-      .post(DESPATCH_ENDPOINT)
+      .post(DESPATCH_ENDPOINT_V2)
       .set(headers)
       .send({ ...VALID_DESPATCH_REQUEST, supplierPartyId: partyId });
     const data = res.body;
@@ -76,7 +76,7 @@ describe("POST /despatch-advice", () => {
       ],
     };
 
-    const res = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     const data = res.body;
 
     expect(res.status).toBe(400);
@@ -87,7 +87,7 @@ describe("POST /despatch-advice", () => {
     const { headers } = await authHeaders();
     const req = { orderId: "abc123" };
 
-    const res = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     const data = res.body;
 
     expect(res.status).toBe(400);
@@ -104,7 +104,7 @@ describe("POST /despatch-advice", () => {
       items: [],
     };
 
-    const res = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     const data = res.body;
 
     expect(res.status).toBe(400);
@@ -124,7 +124,7 @@ describe("POST /despatch-advice", () => {
       ],
     };
 
-    const res = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     const data = res.body;
 
     expect(res.status).toBe(404);
@@ -135,10 +135,10 @@ describe("POST /despatch-advice", () => {
     const { headers, partyId } = await authHeaders();
     const req = { ...VALID_DESPATCH_REQUEST, supplierPartyId: partyId };
 
-    const res1 = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res1 = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     expect(res1.status).toBe(200);
 
-    const res2 = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res2 = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     const data = res2.body;
 
     expect(res2.status).toBe(409);
@@ -158,7 +158,7 @@ describe("POST /despatch-advice", () => {
       ],
     };
 
-    const res = await api.post(DESPATCH_ENDPOINT).set(headers).send(req);
+    const res = await api.post(DESPATCH_ENDPOINT_V2).set(headers).send(req);
     const data = res.body;
 
     expect(res.status).toBe(422);
@@ -166,7 +166,9 @@ describe("POST /despatch-advice", () => {
   });
 
   it("returns 401 if the api key is missing", async () => {
-    const res = await api.post(DESPATCH_ENDPOINT).send(VALID_DESPATCH_REQUEST);
+    const res = await api
+      .post(DESPATCH_ENDPOINT_V2)
+      .send(VALID_DESPATCH_REQUEST);
     expect(res.status).toBe(401);
   });
 
@@ -179,7 +181,7 @@ describe("POST /despatch-advice", () => {
     const apiKey = await login(deliveryUser.email, deliveryUser.password);
 
     const res = await api
-      .post(DESPATCH_ENDPOINT)
+      .post(DESPATCH_ENDPOINT_V2)
       .set({ apiKey })
       .send(VALID_DESPATCH_REQUEST);
 
