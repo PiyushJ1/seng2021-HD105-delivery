@@ -4,27 +4,51 @@ import { api, DESPATCH_ENDPOINT_V2, VALID_DESPATCH_REQUEST } from "../../utils";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db("test");
-const collection = db.collection("despatch_advice");
+const despatchCollection = db.collection("despatch_advice");
 const usersCollection = db.collection("users");
 
 const despatchUser = {
   email: "despatch.user@example.com",
   password: "despatch-password",
   role: "despatch",
-  partyId: "party123",
 };
 
-async function login() {
-  const res = await api
-    .post("/api/auth/login")
-    .send({ email: despatchUser.email, password: despatchUser.password });
-  return res.body.apiKey as string;
+const deliveryUser = {
+  email: "delivery.user@example.com",
+  password: "delivery-password",
+  role: "delivery",
+};
+
+async function login(user: { email: string; password: string; role: string }) {
+  await api.post("/api/auth/register").send({
+    email: user.email,
+    password: user.password,
+    role: user.role,
+  });
+
+  const res = await api.post("/api/auth/login").send({
+    email: user.email,
+    password: user.password,
+  });
+
+  return res.body.apiKey;
+}
+
+async function authHeaders(user: {
+  email: string;
+  password: string;
+  role: string;
+}) {
+  const apiKey = await login(user);
+  const userInfo = await usersCollection.findOne({ email: user.email });
+  const partyId = userInfo!.partyId as string;
+
+  return { headers: { apiKey }, partyId };
 }
 
 beforeEach(async () => {
-  await collection.deleteMany({});
+  await despatchCollection.deleteMany({});
   await usersCollection.deleteMany({ email: despatchUser.email });
-  await usersCollection.insertOne(despatchUser);
 });
 
 afterAll(async () => {
@@ -33,16 +57,17 @@ afterAll(async () => {
 
 describe("GET /despatch-advice/:despatchAdviceId", () => {
   it("returns 200 with details for a specific despatch advice doc", async () => {
-    const apiKey = await login();
+    const { headers, partyId } = await authHeaders(despatchUser);
+
     const res1 = await api
       .post(DESPATCH_ENDPOINT_V2)
-      .set({ apiKey })
-      .send(VALID_DESPATCH_REQUEST);
+      .set(headers)
+      .send({ ...VALID_DESPATCH_REQUEST, supplierPartyId: partyId });
     const data1 = res1.body;
 
-    const res2 = await api.get(
-      `${DESPATCH_ENDPOINT_V2}/${data1.despatchAdviceId}`,
-    );
+    const res2 = await api
+      .get(`${DESPATCH_ENDPOINT_V2}/${data1.despatchAdviceId}`)
+      .set(headers);
     const data2 = res2.body;
 
     expect(res2.status).toBe(200);
@@ -64,12 +89,32 @@ describe("GET /despatch-advice/:despatchAdviceId", () => {
   });
 
   it("returns 404 if no despatch advice was found for the given id", async () => {
-    const res = await api.get(`${DESPATCH_ENDPOINT_V2}/zzzzz111111`);
+    const { headers } = await authHeaders(despatchUser);
+
+    const res = await api
+      .get(`${DESPATCH_ENDPOINT_V2}/zzzzz111111`)
+      .set(headers);
     const data = res.body;
 
     expect(res.status).toBe(404);
     expect(data.error).toEqual(expect.any(String));
   });
 
-  it.todo("returns 403 if the delivery party does not have access to view doc");
+  it("returns 403 if the delivery party does not have access to view doc", async () => {
+    const headers1 = await authHeaders(despatchUser);
+    const res1 = await api
+      .post(DESPATCH_ENDPOINT_V2)
+      .set(headers1.headers)
+      .send({ ...VALID_DESPATCH_REQUEST, supplierPartyId: headers1.partyId });
+    const data1 = res1.body;
+
+    const headers2 = await authHeaders(deliveryUser);
+    const res2 = await api
+      .get(`${DESPATCH_ENDPOINT_V2}/${data1.despatchAdviceId}`)
+      .set(headers2.headers);
+    const data2 = res2.body;
+
+    expect(res2.status).toBe(403);
+    expect(data2.error).toEqual(expect.any(String));
+  });
 });
