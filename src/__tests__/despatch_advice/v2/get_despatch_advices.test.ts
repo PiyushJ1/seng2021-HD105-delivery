@@ -63,8 +63,6 @@ describe("GET /despatch-advice", () => {
   it("returns 200 with despatch advice doc details for a valid request", async () => {
     const { headers, partyId } = await authHeaders(despatchUser);
 
-    console.log(headers);
-
     // send two despatch creation requests
     await api
       .post(DESPATCH_ENDPOINT_V2)
