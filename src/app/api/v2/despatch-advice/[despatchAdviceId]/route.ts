@@ -71,6 +71,7 @@ export async function GET(
     );
   }
 
+	// requesting party can only view the document if they are either the supplier/delivery party
   if (
     despatchAuth.partyId !== despatchAdvice.supplierPartyId &&
     despatchAuth.partyId !== despatchAdvice.deliveryPartyId
