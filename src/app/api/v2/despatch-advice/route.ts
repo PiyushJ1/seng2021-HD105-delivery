@@ -167,19 +167,18 @@ export async function POST(req: NextRequest) {
   });
 }
 
-export async function GET() {
-  // const apiKey =
-  //   req.headers.get("apiKey") ??
-  //   req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-  //   "";
+export async function GET(req: NextRequest) {
+  const apiKey =
+    req.headers.get("apiKey") ??
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+    "";
 
-  // const authResult = await requireAuth(apiKey, {
-  //   roles: ["despatch", "delivery"],
-  // });
-  // if (!authResult.ok) return authResult.response;
-  // const despatchAuth = authResult.auth!;
+  const authResult = await requireAuth(apiKey, {
+    roles: ["despatch", "delivery"],
+  });
+  if (!authResult.ok) return authResult.response;
+  const despatchAuth = authResult.auth!;
 
-  // setup db connection
   const client = await clientPromise;
   const db = client.db(
     process.env.NODE_ENV === "development" ? "test" : "production",
@@ -187,8 +186,23 @@ export async function GET() {
   const collection = db.collection("despatch_advice");
 
   const despatchAdvices = await collection
-    .find({}, { projection: { _id: 0 } })
+    .find(
+      {
+        $or: [
+          { supplierPartyId: despatchAuth.partyId },
+          { deliveryPartyId: despatchAuth.partyId },
+        ],
+      },
+      { projection: { _id: 0 } },
+    )
     .toArray();
+
+  if (despatchAdvices.length === 0) {
+    return NextResponse.json(
+      { error: "No despatch advices found for the requesting party" },
+      { status: 404 },
+    );
+  }
 
   return NextResponse.json({ despatchAdvices }, { status: 200 });
 }
