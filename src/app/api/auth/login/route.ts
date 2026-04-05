@@ -48,11 +48,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: "Logged in successfully!",
       apiKey: tempApiKey,
+      partyId: user.partyId,
     });
   }
 
   return NextResponse.json({
     message: "You are already logged in.",
     apiKey: user.apiKey,
+    partyId: user.partyId,
   });
 }
