@@ -2,6 +2,7 @@ import request from "supertest";
 
 export const api = request("http://localhost:3000");
 export const DESPATCH_ENDPOINT = "/api/despatch-advice";
+export const DESPATCH_ENDPOINT_V2 = "/api/v2/despatch-advice";
 
 export const VALID_DESPATCH_REQUEST = {
   orderId: "abc123",

@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { randomUUID } from "crypto";
 import { DespatchAdviceRequest } from "@/src/types";
 import clientPromise from "@/src/lib/mongodb";
+import { requireAuth } from "@/src/lib/auth";
 
 // mock fetching order for now
 // TODO: fetch the actual order
@@ -75,6 +76,17 @@ async function getInventory(productId: string) {
  */
 
 export async function POST(req: NextRequest) {
+  const apiKey =
+    req.headers.get("apiKey") ??
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+    "";
+
+  const authResult = await requireAuth(apiKey, {
+    roles: ["despatch", "delivery"],
+  });
+  if (!authResult.ok) return authResult.response;
+  const despatchAuth = authResult.auth!;
+
   // setup db connection
   const client = await clientPromise;
   const db = client.db(
@@ -98,6 +110,13 @@ export async function POST(req: NextRequest) {
         error: "Missing or invalid fields in the request body",
       },
       { status: 400 },
+    );
+  }
+
+  if (body.supplierPartyId !== despatchAuth.partyId) {
+    return NextResponse.json(
+      { error: "Accessing this endpoint is unauthorised" },
+      { status: 403 },
     );
   }
 
@@ -135,7 +154,7 @@ export async function POST(req: NextRequest) {
   await collection.insertOne({
     despatchAdviceId,
     orderId: body.orderId,
-    supplierPartyId: body.supplierPartyId,
+    supplierPartyId: despatchAuth.partyId,
     deliveryPartyId: body.deliveryPartyId,
     despatchDate: body.despatchDate,
     items: body.items,
@@ -148,8 +167,18 @@ export async function POST(req: NextRequest) {
   });
 }
 
-export async function GET() {
-  // setup db connection
+export async function GET(req: NextRequest) {
+  const apiKey =
+    req.headers.get("apiKey") ??
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+    "";
+
+  const authResult = await requireAuth(apiKey, {
+    roles: ["despatch", "delivery"],
+  });
+  if (!authResult.ok) return authResult.response;
+  const despatchAuth = authResult.auth!;
+
   const client = await clientPromise;
   const db = client.db(
     process.env.NODE_ENV === "development" ? "test" : "production",
@@ -157,8 +186,23 @@ export async function GET() {
   const collection = db.collection("despatch_advice");
 
   const despatchAdvices = await collection
-    .find({}, { projection: { _id: 0 } })
+    .find(
+      {
+        $or: [
+          { supplierPartyId: despatchAuth.partyId },
+          { deliveryPartyId: despatchAuth.partyId },
+        ],
+      },
+      { projection: { _id: 0 } },
+    )
     .toArray();
+
+  if (despatchAdvices.length === 0) {
+    return NextResponse.json(
+      { error: "No despatch advices found for the requesting party" },
+      { status: 404 },
+    );
+  }
 
   return NextResponse.json({ despatchAdvices }, { status: 200 });
 }

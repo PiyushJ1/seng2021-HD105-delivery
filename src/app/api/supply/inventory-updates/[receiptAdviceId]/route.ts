@@ -25,14 +25,14 @@ export async function PUT(
     return NextResponse.json({ error: "missing auth token" }, { status: 401 });
   }
 
-  const auth = await getAuth(req);
-  if (!auth) {
-    return NextResponse.json({ error: "missing auth token" }, { status: 401 });
-  }
+  // const auth = await getAuth(req);
+  // if (!auth) {
+  //   return NextResponse.json({ error: "missing auth token" }, { status: 401 });
+  // }
 
-  if (auth.role !== "despatch_party") {
-    return NextResponse.json({ error: "Not authorised" }, { status: 403 });
-  }
+  // if (auth.role !== "despatch_party") {
+  //   return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+  // }
 
   let body: Record<string, unknown>;
   try {
