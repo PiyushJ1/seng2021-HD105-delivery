@@ -27,11 +27,280 @@ export function getOpenAPISpec(serverUrl?: string) {
         },
       ],
       tags: [
+        { name: "Authentication" },
         { name: "Despatch Advice" },
         { name: "Receipt Advice" },
         { name: "Health" },
       ],
       paths: {
+        "/api/auth/register": {
+          post: {
+            tags: ["Authentication"],
+            summary: "Register a new user account",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: "#/components/schemas/AuthRegisterRequest",
+                  },
+                },
+              },
+            },
+            responses: {
+              "201": {
+                description: "Account registered successfully",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthRegisterResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid email, password, or role",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthRegisterBadRequestError",
+                    },
+                  },
+                },
+              },
+              "409": {
+                description: "Email already registered",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthRegisterConflictError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/auth/login": {
+          post: {
+            tags: ["Authentication"],
+            summary: "Log in with email and password",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: "#/components/schemas/AuthLoginRequest",
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Logged in successfully",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthLoginResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid email or password format",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthLoginBadRequestError",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Incorrect email or password",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthLoginNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/v2/despatch-advice": {
+          post: {
+            tags: ["Despatch Advice"],
+            summary: "Create a despatch advice",
+            security: [{ apiKeyAuth: [] }],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: "#/components/schemas/DespatchAdviceRequest",
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Despatch advice created successfully",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid request body",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateBadRequestError",
+                    },
+                  },
+                },
+              },
+              "401": {
+                description: "Missing or invalid authentication token",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthenticationErrorResponse",
+                    },
+                  },
+                },
+              },
+              "403": {
+                description: "Accessing this endpoint is unauthorised",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthorizationErrorResponse",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "orderId was not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateNotFoundError",
+                    },
+                  },
+                },
+              },
+              "409": {
+                description: "Despatch advice already exists for order",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateConflictError",
+                    },
+                  },
+                },
+              },
+              "422": {
+                description: "Item quantity exceeds inventory",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceCreateUnprocessableError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          get: {
+            tags: ["Despatch Advice"],
+            summary: "Get all despatch advices for the authenticated party",
+            security: [{ apiKeyAuth: [] }],
+            responses: {
+              "200": {
+                description: "List of despatch advices",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceListResponse",
+                    },
+                  },
+                },
+              },
+              "401": {
+                description: "Missing or invalid authentication token",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthenticationErrorResponse",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/v2/despatch-advice/{despatchAdviceId}": {
+          get: {
+            tags: ["Despatch Advice"],
+            summary: "Get a despatch advice by ID",
+            security: [{ apiKeyAuth: [] }],
+            parameters: [
+              {
+                in: "path",
+                name: "despatchAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            responses: {
+              "200": {
+                description: "Despatch advice details",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/DespatchAdvice" },
+                  },
+                },
+              },
+              "401": {
+                description: "Missing or invalid authentication token",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthenticationErrorResponse",
+                    },
+                  },
+                },
+              },
+              "403": {
+                description:
+                  "You don't have permission to view this despatch advice",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthorizationErrorResponse",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Despatch advice not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchAdviceByIdNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         "/api/despatch-advice": {
           post: {
             tags: ["Despatch Advice"],
@@ -422,6 +691,13 @@ export function getOpenAPISpec(serverUrl?: string) {
         },
       },
       components: {
+        securitySchemes: {
+          apiKeyAuth: {
+            type: "apiKey",
+            in: "header",
+            name: "apiKey",
+          },
+        },
         schemas: {
           ErrorResponse: {
             type: "object",
@@ -430,7 +706,7 @@ export function getOpenAPISpec(serverUrl?: string) {
             },
             required: ["error"],
             example: {
-              error: "Receipt advice not found",
+              error: "The resource was not found",
             },
           },
           DespatchAdviceCreateBadRequestError: {
@@ -572,6 +848,119 @@ export function getOpenAPISpec(serverUrl?: string) {
             required: ["error"],
             example: {
               error: "Receipt advice not found",
+            },
+          },
+          AuthRegisterRequest: {
+            type: "object",
+            properties: {
+              email: { type: "string", format: "email" },
+              password: { type: "string" },
+              role: {
+                type: "string",
+                enum: ["delivery", "despatch"],
+              },
+            },
+            required: ["email", "password", "role"],
+            example: {
+              email: "user@example.com",
+              password: "secret123",
+              role: "delivery",
+            },
+          },
+          AuthRegisterResponse: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+            required: ["message"],
+            example: {
+              message: "Account registered successfully!",
+            },
+          },
+          AuthRegisterBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Password or role format is invalid",
+            },
+          },
+          AuthRegisterConflictError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "A user is already registered with this email",
+            },
+          },
+          AuthLoginRequest: {
+            type: "object",
+            properties: {
+              email: { type: "string", format: "email" },
+              password: { type: "string" },
+            },
+            required: ["email", "password"],
+            example: {
+              email: "user@example.com",
+              password: "secret123",
+            },
+          },
+          AuthLoginResponse: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              apiKey: { type: "string" },
+              partyId: { type: "string" },
+            },
+            required: ["message", "apiKey", "partyId"],
+            example: {
+              message: "Logged in successfully!",
+              apiKey: "7d6bc0ac-4d2d-4d74-8ac8-87d5d3c9e5ab",
+              partyId: "b7f18a2f-1c77-4db2-9d0b-83d8f3a2b4af",
+            },
+          },
+          AuthLoginBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Password must be a string",
+            },
+          },
+          AuthLoginNotFoundError: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+            required: ["message"],
+            example: {
+              message: "Incorrect email or password",
+            },
+          },
+          AuthenticationErrorResponse: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Missing or invalid authentication token",
+            },
+          },
+          AuthorizationErrorResponse: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Accessing this endpoint is unauthorised",
             },
           },
           DespatchItem: {
