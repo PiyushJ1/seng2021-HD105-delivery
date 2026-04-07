@@ -449,7 +449,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Invalid or missing fields",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateReceiptBadRequestError",
+                    },
                   },
                 },
               },
@@ -457,7 +459,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Missing authentication token",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateReceiptUnauthorizedError",
+                    },
                   },
                 },
               },
@@ -465,7 +469,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Receipt advice, warehouse, or bin not found",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateReceiptNotFoundError",
+                    },
                   },
                 },
               },
@@ -473,7 +479,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Receipt already applied or invalid state",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateReceiptConflictError",
+                    },
                   },
                 },
               },
@@ -482,7 +490,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                   "Invalid SKU/UoM or quantity exceeds allowed amount",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateReceiptUnprocessableError",
+                    },
                   },
                 },
               },
@@ -568,7 +578,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Invalid or missing fields",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateCancellationBadRequestError",
+                    },
                   },
                 },
               },
@@ -576,7 +588,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Missing authentication token",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateCancellationUnauthorizedError",
+                    },
                   },
                 },
               },
@@ -585,7 +599,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                   "Fulfilment cancellation, warehouse, or bin not found",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateCancellationNotFoundError",
+                    },
                   },
                 },
               },
@@ -593,7 +609,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                 description: "Cancellation already applied or invalid state",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateCancellationConflictError",
+                    },
                   },
                 },
               },
@@ -602,7 +620,9 @@ export function getOpenAPISpec(serverUrl?: string) {
                   "Invalid SKU/UoM or quantity exceeds allowed amount",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                    schema: {
+                      $ref: "#/components/schemas/InventoryUpdateCancellationUnprocessableError",
+                    },
                   },
                 },
               },
@@ -1710,6 +1730,107 @@ export function getOpenAPISpec(serverUrl?: string) {
             required: ["error"],
             example: {
               error: "Cannot move to RECEIVED if no receipt advice exists",
+            },
+          },
+          InventoryUpdateReceiptBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Invalid or missing fields",
+            },
+          },
+          InventoryUpdateReceiptUnauthorizedError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "missing auth token",
+            },
+          },
+          InventoryUpdateReceiptNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "receipt advice ID, warehouse ID or bin ID not found",
+            },
+          },
+          InventoryUpdateReceiptConflictError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "receipt already applied",
+            },
+          },
+          InventoryUpdateReceiptUnprocessableError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "received quantity exceeds allowed qty",
+            },
+          },
+          InventoryUpdateCancellationBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Invalid or missing fields",
+            },
+          },
+          InventoryUpdateCancellationUnauthorizedError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "missing auth token",
+            },
+          },
+          InventoryUpdateCancellationNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error:
+                "fulfilment cancellation ID, warehouse ID or bin ID not found",
+            },
+          },
+          InventoryUpdateCancellationConflictError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "cancellation already applied",
+            },
+          },
+          InventoryUpdateCancellationUnprocessableError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "cancelled quantity exceeds allowed qty",
             },
           },
           HealthResponse: {
