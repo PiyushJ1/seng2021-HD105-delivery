@@ -30,6 +30,7 @@ export function getOpenAPISpec(serverUrl?: string) {
         { name: "Authentication" },
         { name: "Despatch Advice" },
         { name: "Receipt Advice" },
+        { name: "Supplies" },
         { name: "Health" },
       ],
       paths: {
@@ -650,6 +651,92 @@ export function getOpenAPISpec(serverUrl?: string) {
             },
           },
         },
+        "/api/supplies/{supplyId}/lifecycle": {
+          patch: {
+            tags: ["Supplies"],
+            summary: "Update lifecycle state for a supply",
+            parameters: [
+              {
+                in: "path",
+                name: "supplyId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    $ref: "#/components/schemas/SupplyLifecyclePatchRequest",
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Supply lifecycle updated",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/SupplyLifecyclePatchResponse",
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid request body",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/SupplyLifecycleBadRequestError",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Supply not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/SupplyLifecycleNotFoundError",
+                    },
+                  },
+                },
+              },
+              "409": {
+                description: "Version conflict",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/SupplyLifecycleConflictError",
+                    },
+                  },
+                },
+              },
+              "422": {
+                description: "State transition is not allowed",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/SupplyLifecycleUnprocessableError",
+                    },
+                  },
+                },
+              },
+              "500": {
+                description: "Internal server error",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ErrorResponse",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         "/api/health": {
           get: {
             tags: ["Health"],
@@ -1211,6 +1298,111 @@ export function getOpenAPISpec(serverUrl?: string) {
                   quantityReceived: 5,
                 },
               ],
+            },
+          },
+          SupplyLifecyclePatchRequest: {
+            type: "object",
+            properties: {
+              newState: {
+                type: "string",
+                enum: [
+                  "PLANNED",
+                  "IN_TRANSIT",
+                  "RECEIVED",
+                  "PUTAWAY",
+                  "CLOSED",
+                  "CANCELLED",
+                ],
+              },
+              expectedVersion: { type: "number" },
+              reasonCode: { type: "string" },
+              reasonText: { type: "string" },
+            },
+            required: ["newState", "expectedVersion"],
+            example: {
+              newState: "IN_TRANSIT",
+              expectedVersion: 1,
+              reasonCode: "MANUAL_UPDATE",
+              reasonText: "State updated after warehouse confirmation",
+            },
+          },
+          SupplyLifecyclePatchResponse: {
+            type: "object",
+            properties: {
+              supplyId: { type: "string" },
+              orderId: { type: "string" },
+              receiptAdviceId: { type: "string", nullable: true },
+              warehouseId: { type: "string" },
+              lifecycleState: {
+                type: "string",
+                enum: [
+                  "PLANNED",
+                  "IN_TRANSIT",
+                  "RECEIVED",
+                  "PUTAWAY",
+                  "CLOSED",
+                  "CANCELLED",
+                ],
+              },
+              stateUpdatedAt: { type: "string", format: "date-time" },
+              version: { type: "number" },
+            },
+            required: [
+              "supplyId",
+              "orderId",
+              "warehouseId",
+              "lifecycleState",
+              "stateUpdatedAt",
+              "version",
+            ],
+            example: {
+              supplyId: "SUP-001",
+              orderId: "ORDER-1001",
+              receiptAdviceId: "RA-2001",
+              warehouseId: "WH-01",
+              lifecycleState: "IN_TRANSIT",
+              stateUpdatedAt: "2026-04-07T09:45:00.000Z",
+              version: 2,
+            },
+          },
+          SupplyLifecycleBadRequestError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Missing or invalid expectedVersion",
+            },
+          },
+          SupplyLifecycleNotFoundError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Supply ID not found",
+            },
+          },
+          SupplyLifecycleConflictError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Version mismatch: expectedVersion does not match server",
+            },
+          },
+          SupplyLifecycleUnprocessableError: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+            required: ["error"],
+            example: {
+              error: "Cannot move to RECEIVED if no receipt advice exists",
             },
           },
           HealthResponse: {
