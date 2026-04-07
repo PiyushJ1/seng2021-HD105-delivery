@@ -35,3 +35,4 @@ alt Inventory update failure
     InternalAPI-->>UnifiedDashboard: Error 500
     UnifiedDashboard-->>WarehouseWorker: Show failure
 end
+```
