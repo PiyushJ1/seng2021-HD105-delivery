@@ -302,6 +302,313 @@ export function getOpenAPISpec(serverUrl?: string) {
             },
           },
         },
+        "/api/v2/despatch/receipt-advice/{receiptAdviceId}": {
+          get: {
+            tags: ["Receipt Advice"],
+            summary:
+              "Get receipt advice details as viewed by despatch workflow",
+            security: [{ apiKeyAuth: [] }],
+            parameters: [
+              {
+                in: "path",
+                name: "receiptAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            responses: {
+              "200": {
+                description:
+                  "Receipt advice details with delivery party flattened into each item",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/ReceiptAdviceDespatchViewResponse",
+                    },
+                  },
+                },
+              },
+              "401": {
+                description: "Missing or invalid authentication token",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthenticationErrorResponse",
+                    },
+                  },
+                },
+              },
+              "403": {
+                description:
+                  "You do not have permission to view this receipt advice",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/AuthorizationErrorResponse",
+                    },
+                  },
+                },
+              },
+              "404": {
+                description: "Receipt advice not found",
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/DespatchReceiptAdviceByIdNotFoundError",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/v2/supply/inventory-updates/{receiptAdviceId}": {
+          put: {
+            tags: ["Supplies"],
+            summary: "Apply inventory updates from a receipt advice",
+            parameters: [
+              {
+                in: "path",
+                name: "receiptAdviceId",
+                required: true,
+                schema: { type: "string" },
+              },
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      warehouseId: { type: "string" },
+                      binId: { type: "string" },
+                      inventoryAdjustmentLines: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            sku: { type: "string" },
+                            uom: { type: "string" },
+                            quantityReceived: { type: "number" },
+                          },
+                          required: ["sku", "quantityReceived"],
+                        },
+                      },
+                    },
+                    required: [
+                      "warehouseId",
+                      "binId",
+                      "inventoryAdjustmentLines",
+                    ],
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Inventory updated successfully",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        receiptAdviceId: { type: "string" },
+                        applied: { type: "boolean" },
+                        appliedAt: { type: "string", format: "date-time" },
+                        positionsUpdated: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              warehouseId: { type: "string" },
+                              binId: { type: "string" },
+                              sku: { type: "string" },
+                              uom: { type: "string" },
+                              onHand: { type: "number" },
+                              available: { type: "number" },
+                              updatedAt: {
+                                type: "string",
+                                format: "date-time",
+                              },
+                            },
+                          },
+                        },
+                      },
+                      required: [
+                        "receiptAdviceId",
+                        "applied",
+                        "appliedAt",
+                        "positionsUpdated",
+                      ],
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid or missing fields",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "401": {
+                description: "Missing authentication token",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "404": {
+                description: "Receipt advice, warehouse, or bin not found",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "409": {
+                description: "Receipt already applied or invalid state",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "422": {
+                description:
+                  "Invalid SKU/UoM or quantity exceeds allowed amount",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/api/v2/supply/inventory-updates/{fulfilmentCancellationId}": {
+          put: {
+            tags: ["Supplies"],
+            summary: "Apply inventory updates from a fulfilment cancellation",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      warehouseId: { type: "string" },
+                      binId: { type: "string" },
+                      inventoryAdjustmentLines: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            sku: { type: "string" },
+                            uom: { type: "string" },
+                            quantityCancelled: { type: "number" },
+                          },
+                          required: ["sku", "quantityCancelled"],
+                        },
+                      },
+                    },
+                    required: [
+                      "warehouseId",
+                      "binId",
+                      "inventoryAdjustmentLines",
+                    ],
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                description: "Inventory updated successfully",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        fulfilmentCancellationId: { type: "string" },
+                        applied: { type: "boolean" },
+                        appliedAt: { type: "string", format: "date-time" },
+                        positionsUpdated: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              warehouseId: { type: "string" },
+                              binId: { type: "string" },
+                              sku: { type: "string" },
+                              uom: { type: "string" },
+                              onHand: { type: "number" },
+                              available: { type: "number" },
+                              updatedAt: {
+                                type: "string",
+                                format: "date-time",
+                              },
+                            },
+                          },
+                        },
+                      },
+                      required: [
+                        "fulfilmentCancellationId",
+                        "applied",
+                        "appliedAt",
+                        "positionsUpdated",
+                      ],
+                    },
+                  },
+                },
+              },
+              "400": {
+                description: "Invalid or missing fields",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "401": {
+                description: "Missing authentication token",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "404": {
+                description:
+                  "Fulfilment cancellation, warehouse, or bin not found",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "409": {
+                description: "Cancellation already applied or invalid state",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+              "422": {
+                description:
+                  "Invalid SKU/UoM or quantity exceeds allowed amount",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/ErrorResponse" },
+                  },
+                },
+              },
+            },
+          },
+        },
         "/api/despatch-advice": {
           post: {
             tags: ["Despatch Advice"],
