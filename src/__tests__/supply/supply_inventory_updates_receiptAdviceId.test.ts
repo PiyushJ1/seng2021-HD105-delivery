@@ -2,7 +2,7 @@ import { expect, describe, it, beforeEach, afterAll } from "vitest";
 import { api } from "../utils";
 import { MongoClient } from "mongodb";
 
-const BASE_URL = "/api/supply/inventory-updates";
+const BASE_URL = "/api/v2/supply/inventory-updates";
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db("test");
 
@@ -17,7 +17,7 @@ afterAll(async () => {
   await client.close();
 });
 
-describe.skip("PUT /api/supply/inventory-updates/{receiptAdviceId}", () => {
+describe("PUT /api/supply/inventory-updates/{receiptAdviceId}", () => {
   it("Returns 401 if auth token is missing", async () => {
     const res = await api.put(`${BASE_URL}/RA-TEST-401`).send({
       warehouseId: "W-1",
