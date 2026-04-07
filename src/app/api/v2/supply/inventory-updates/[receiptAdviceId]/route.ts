@@ -18,10 +18,9 @@ type ReceiptItem = {
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params?: { receiptAdviceId?: string } },
+  { params }: { params: Promise<{ receiptAdviceId: string }> },
 ) {
-  const receiptAdviceId =
-    params?.receiptAdviceId || req.nextUrl.pathname.split("/").pop();
+  const { receiptAdviceId } = await params;
 
   const authHeader = req.headers.get("authorization");
 
