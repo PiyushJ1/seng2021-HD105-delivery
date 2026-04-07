@@ -21,8 +21,7 @@ export async function PUT(
   { params }: { params?: { receiptAdviceId?: string } },
 ) {
   const receiptAdviceId =
-    params?.receiptAdviceId ||
-    req.nextUrl.pathname.split("/").pop();
+    params?.receiptAdviceId || req.nextUrl.pathname.split("/").pop();
 
   const authHeader = req.headers.get("authorization");
 
@@ -113,13 +112,9 @@ export async function PUT(
     );
   }
 
-  const warehouse = await db
-    .collection("warehouses")
-    .findOne({ warehouseId });
+  const warehouse = await db.collection("warehouses").findOne({ warehouseId });
 
-  const bin = await db
-    .collection("bins")
-    .findOne({ warehouseId, binId });
+  const bin = await db.collection("bins").findOne({ warehouseId, binId });
 
   if (!warehouse || !bin) {
     return NextResponse.json(
@@ -130,10 +125,7 @@ export async function PUT(
 
   const receiptItems: ReceiptItem[] = receipt.items ?? [];
 
-  const receiptBySku = new Map<
-    string,
-    { totalQty: number; uom?: string }
-  >();
+  const receiptBySku = new Map<string, { totalQty: number; uom?: string }>();
 
   for (const item of receiptItems) {
     const existing = receiptBySku.get(item.sku);
@@ -184,8 +176,7 @@ export async function PUT(
 
     if (existingRow) {
       const newOnHand = (existingRow.onHand ?? 0) + line.quantityReceived;
-      const newAvailable =
-        (existingRow.available ?? 0) + line.quantityReceived;
+      const newAvailable = (existingRow.available ?? 0) + line.quantityReceived;
 
       await db.collection("inventory").updateOne(
         { warehouseId, binId, sku: line.sku },
@@ -230,10 +221,9 @@ export async function PUT(
     }
   }
 
-  await db.collection("receiptAdvices").updateOne(
-    { receiptAdviceId },
-    { $set: { inventoryUpdateApplied: true } },
-  );
+  await db
+    .collection("receiptAdvices")
+    .updateOne({ receiptAdviceId }, { $set: { inventoryUpdateApplied: true } });
 
   return NextResponse.json({
     receiptAdviceId,

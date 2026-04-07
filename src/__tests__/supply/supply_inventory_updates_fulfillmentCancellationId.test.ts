@@ -61,7 +61,11 @@ describe.skip("PUT /api/v2/supply/inventory-updates/:fulfilmentCancellationId", 
     const res = await api
       .put(`${INVENTORY_ENDPOINT}/${fcId}`)
       .set({ authorization: "token" })
-      .send({ warehouseId, binId, inventoryAdjustmentLines: [{ sku, quantityCancelled: -5 }] });
+      .send({
+        warehouseId,
+        binId,
+        inventoryAdjustmentLines: [{ sku, quantityCancelled: -5 }],
+      });
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("negative quantityCancelled");
   });
@@ -70,7 +74,11 @@ describe.skip("PUT /api/v2/supply/inventory-updates/:fulfilmentCancellationId", 
     const res = await api
       .put(`${INVENTORY_ENDPOINT}/nonexistent-fc`)
       .set({ authorization: "token" })
-      .send({ warehouseId, binId, inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }] });
+      .send({
+        warehouseId,
+        binId,
+        inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }],
+      });
     expect(res.status).toBe(404);
     expect(res.body.error).toBe("fulfilment cancellation not found");
   });
@@ -80,13 +88,21 @@ describe.skip("PUT /api/v2/supply/inventory-updates/:fulfilmentCancellationId", 
     await api
       .put(`${INVENTORY_ENDPOINT}/${fcId}`)
       .set({ authorization: "token" })
-      .send({ warehouseId, binId, inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }] });
+      .send({
+        warehouseId,
+        binId,
+        inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }],
+      });
 
     // Apply again should return 409
     const res = await api
       .put(`${INVENTORY_ENDPOINT}/${fcId}`)
       .set({ authorization: "token" })
-      .send({ warehouseId, binId, inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }] });
+      .send({
+        warehouseId,
+        binId,
+        inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }],
+      });
 
     expect(res.status).toBe(409);
     expect(res.body.error).toBe("cancellation already applied");
@@ -103,7 +119,11 @@ describe.skip("PUT /api/v2/supply/inventory-updates/:fulfilmentCancellationId", 
     const res = await api
       .put(`${INVENTORY_ENDPOINT}/${newFcId}`)
       .set({ authorization: "token" })
-      .send({ warehouseId, binId, inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }] });
+      .send({
+        warehouseId,
+        binId,
+        inventoryAdjustmentLines: [{ sku, quantityCancelled: 1 }],
+      });
 
     expect(res.status).toBe(422);
     expect(res.body.error).toBe("SKU not in cancellation");
@@ -120,7 +140,11 @@ describe.skip("PUT /api/v2/supply/inventory-updates/:fulfilmentCancellationId", 
     const res = await api
       .put(`${INVENTORY_ENDPOINT}/${newFcId}`)
       .set({ authorization: "token" })
-      .send({ warehouseId, binId, inventoryAdjustmentLines: [{ sku, quantityCancelled: 5 }] });
+      .send({
+        warehouseId,
+        binId,
+        inventoryAdjustmentLines: [{ sku, quantityCancelled: 5 }],
+      });
 
     expect(res.status).toBe(200);
     expect(res.body.applied).toBe(true);

@@ -29,10 +29,7 @@ export async function PUT(
   const authHeader = req.headers.get("authorization");
 
   if (!authHeader) {
-    return NextResponse.json(
-      { error: "missing auth token" },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: "missing auth token" }, { status: 401 });
   }
 
   let body: Record<string, unknown>;
@@ -119,13 +116,9 @@ export async function PUT(
     );
   }
 
-  const warehouse = await db
-    .collection("warehouses")
-    .findOne({ warehouseId });
+  const warehouse = await db.collection("warehouses").findOne({ warehouseId });
 
-  const bin = await db
-    .collection("bins")
-    .findOne({ warehouseId, binId });
+  const bin = await db.collection("bins").findOne({ warehouseId, binId });
 
   if (!warehouse || !bin) {
     return NextResponse.json(
@@ -192,7 +185,11 @@ export async function PUT(
       await db.collection("inventory").updateOne(
         { warehouseId, binId, sku: line.sku },
         {
-          $set: { onHand: newOnHand, available: newAvailable, updatedAt: appliedAt },
+          $set: {
+            onHand: newOnHand,
+            available: newAvailable,
+            updatedAt: appliedAt,
+          },
         },
       );
 
@@ -229,10 +226,12 @@ export async function PUT(
     }
   }
 
-  await db.collection("fulfilmentCancellations").updateOne(
-    { fulfilmentCancellationId },
-    { $set: { inventoryUpdateApplied: true } },
-  );
+  await db
+    .collection("fulfilmentCancellations")
+    .updateOne(
+      { fulfilmentCancellationId },
+      { $set: { inventoryUpdateApplied: true } },
+    );
 
   return NextResponse.json({
     fulfilmentCancellationId,
