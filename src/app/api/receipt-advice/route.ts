@@ -224,7 +224,10 @@ export async function POST(req: NextRequest) {
   );
 }
 
-async function generateInvoice(receiptAdvice: ReceiptAdviceRequest, despatchAdvice: any) {
+async function generateInvoice(
+  receiptAdvice: ReceiptAdviceRequest,
+  despatchAdvice: any,
+) {
   const res = await fetch("https://lastminutepush.one/v1/invoices", {
     method: "POST",
     headers: {
