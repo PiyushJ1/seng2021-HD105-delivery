@@ -192,14 +192,6 @@ export async function POST(req: NextRequest) {
 
   const receiptAdviceId = randomUUID();
 
-  let invoiceId: string | null = null;
-  try {
-    const invoice = await generateInvoice(body, despatchDoc);
-    invoiceId = invoice.invoice?.invoice_id ?? null;
-  } catch (err) {
-    console.error("invoice generation failed:", err);
-  }
-
   await receiptCollection.insertOne({
     receiptAdviceId,
     despatchId: body.despatchId,
@@ -208,7 +200,6 @@ export async function POST(req: NextRequest) {
     items: body.items,
     totalItemsReceived,
     status,
-    invoiceId,
   });
 
   return NextResponse.json(
@@ -216,44 +207,7 @@ export async function POST(req: NextRequest) {
       receiptAdviceId,
       status,
       totalItemsReceived,
-      invoiceId,
     },
     { status: 200 },
   );
-}
-
-async function generateInvoice(receiptAdvice: any, despatchAdvice: any) {
-  const res = await fetch("https://lastminutepush.one/v1/invoices", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": process.env.INVOICE_API_KEY!,
-    },
-    body: JSON.stringify({
-      order_reference: despatchAdvice.orderId,
-      customer_id: despatchAdvice.deliveryPartyId,
-      issue_date: new Date().toISOString().split("T")[0],
-      due_date: new Date(Date.now() + 30 * 24 * 3600 * 1000)
-        .toISOString()
-        .split("T")[0],
-      currency: "AUD",
-      supplier: {
-        name: "Despatch Party",
-        identifier: despatchAdvice.supplierPartyId,
-      },
-      customer: {
-        name: "Delivery Party",
-        identifier: despatchAdvice.deliveryPartyId,
-      },
-      items: receiptAdvice.items.map((item: any) => ({
-        name: item.productId,
-        description: `${item.productId} delivery`,
-        quantity: item.quantityReceived,
-        unit_price: 0, // placeholder for now
-        unit_code: "EA",
-      })),
-    }),
-  });
-
-  return await res.json();
 }
