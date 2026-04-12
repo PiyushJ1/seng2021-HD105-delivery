@@ -185,6 +185,7 @@ export async function GET(
       deliveryPartyId: receipt.deliveryPartyId,
       status: receipt.status,
       items: receipt.items,
+      invoiceId: receipt.invoiceId,
     },
     { status: 200 },
   );
