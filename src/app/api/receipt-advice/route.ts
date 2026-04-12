@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
     const invoice = await generateInvoice(body, despatchDoc);
     invoiceId = invoice.invoice?.invoice_id ?? null;
   } catch (err) {
-    console.error("invoice generation faield:", err);
+    console.error("invoice generation failed:", err);
   }
 
   await receiptCollection.insertOne({
