@@ -1,11 +1,14 @@
 import clientPromise from "@/src/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET({
-  params,
-}: {
-  params: Promise<{ receiptAdviceId: string }>;
-}) {
+export async function GET(
+  req: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ receiptAdviceId: string }>;
+  },
+) {
   const client = await clientPromise;
   const db = client.db(
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
