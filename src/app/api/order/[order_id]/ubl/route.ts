@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BASE_URL = process.env.API_BASE_URL!;
 
-/**
- * Helper to build auth headers
- */
 function buildHeaders(req: NextRequest) {
   const auth = req.headers.get("authorization");
   const email = req.headers.get("x-party-email");
@@ -19,16 +16,18 @@ function buildHeaders(req: NextRequest) {
   };
 }
 
+type Params = Promise<{ order_id: string }>;
+
 /**
  * GET /api/order/:order_id/ubl
  * Fetch order UBL XML
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { order_id: string } },
+  { params }: { params: Params },
 ) {
   try {
-    const { order_id } = params;
+    const { order_id } = await params;
 
     const headers = buildHeaders(req);
 

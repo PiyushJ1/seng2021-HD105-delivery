@@ -25,10 +25,10 @@ function buildHeaders(req: NextRequest) {
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { order_id: string } },
+  { params }: { params: Promise<{ order_id: string }> },
 ) {
   try {
-    const { order_id } = params;
+    const { order_id } = await params;
 
     const headers = buildHeaders(req);
 
