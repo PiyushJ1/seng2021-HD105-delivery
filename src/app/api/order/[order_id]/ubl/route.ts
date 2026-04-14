@@ -22,10 +22,7 @@ type Params = Promise<{ order_id: string }>;
  * GET /api/order/:order_id/ubl
  * Fetch order UBL XML
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Params },
-) {
+export async function GET(req: NextRequest, { params }: { params: Params }) {
   try {
     const { order_id } = await params;
 

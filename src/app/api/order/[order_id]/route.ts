@@ -21,10 +21,7 @@ type Params = Promise<{ order_id: string }>;
 /**
  * GET /api/order/:order_id
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Params },
-) {
+export async function GET(req: NextRequest, { params }: { params: Params }) {
   try {
     const { order_id } = await params;
 
@@ -51,10 +48,7 @@ export async function GET(
 /**
  * PUT /api/order/:order_id
  */
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Params },
-) {
+export async function PUT(req: NextRequest, { params }: { params: Params }) {
   try {
     const { order_id } = await params;
 
@@ -87,10 +81,7 @@ export async function PUT(
 /**
  * DELETE /api/order/:order_id
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Params },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   try {
     const { order_id } = await params;
 
