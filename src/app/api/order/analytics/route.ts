@@ -49,30 +49,29 @@ export async function GET(req: NextRequest) {
             },
           ].filter(Boolean),
         },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
     const response = await fetch(
       `${BASE_URL}/v1/analytics/orders?fromDate=${encodeURIComponent(
-        fromDate
+        fromDate,
       )}&toDate=${encodeURIComponent(toDate)}`,
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
-
   } catch (error: any) {
     console.error("GET analytics error:", error.message);
 
     return NextResponse.json(
       { detail: error.message || "Internal server error" },
-      { status: error.message?.includes("Authorization") ? 401 : 500 }
+      { status: error.message?.includes("Authorization") ? 401 : 500 },
     );
   }
 }

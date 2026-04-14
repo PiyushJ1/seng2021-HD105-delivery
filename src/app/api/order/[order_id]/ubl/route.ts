@@ -25,20 +25,17 @@ function buildHeaders(req: NextRequest) {
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { order_id: string } }
+  { params }: { params: { order_id: string } },
 ) {
   try {
     const { order_id } = params;
 
     const headers = buildHeaders(req);
 
-    const response = await fetch(
-      `${BASE_URL}/v1/order/${order_id}/ubl`,
-      {
-        method: "GET",
-        headers,
-      }
-    );
+    const response = await fetch(`${BASE_URL}/v1/order/${order_id}/ubl`, {
+      method: "GET",
+      headers,
+    });
 
     const xml = await response.text();
 
@@ -48,13 +45,12 @@ export async function GET(
         "Content-Type": "application/xml",
       },
     });
-
   } catch (error: any) {
     console.error("GET order UBL error:", error.message);
 
     return NextResponse.json(
       { detail: error.message || "Internal server error" },
-      { status: error.message?.includes("Authorization") ? 401 : 500 }
+      { status: error.message?.includes("Authorization") ? 401 : 500 },
     );
   }
 }

@@ -23,7 +23,7 @@ function buildHeaders(req: NextRequest) {
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { order_id: string } }
+  { params }: { params: { order_id: string } },
 ) {
   try {
     const { order_id } = params;
@@ -38,13 +38,12 @@ export async function GET(
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
-
   } catch (error: any) {
     console.error("GET order error:", error.message);
 
     return NextResponse.json(
       { detail: error.message || "Internal server error" },
-      { status: error.message?.includes("Authorization") ? 401 : 500 }
+      { status: error.message?.includes("Authorization") ? 401 : 500 },
     );
   }
 }
@@ -55,7 +54,7 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { order_id: string } }
+  { params }: { params: { order_id: string } },
 ) {
   try {
     const { order_id } = params;
@@ -76,13 +75,12 @@ export async function PUT(
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
-
   } catch (error: any) {
     console.error("PUT order error:", error.message);
 
     return NextResponse.json(
       { detail: error.message || "Internal server error" },
-      { status: error.message?.includes("Authorization") ? 401 : 500 }
+      { status: error.message?.includes("Authorization") ? 401 : 500 },
     );
   }
 }
@@ -93,7 +91,7 @@ export async function PUT(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { order_id: string } }
+  { params }: { params: { order_id: string } },
 ) {
   try {
     const { order_id } = params;
@@ -112,13 +110,12 @@ export async function DELETE(
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
-
   } catch (error: any) {
     console.error("DELETE order error:", error.message);
 
     return NextResponse.json(
       { detail: error.message || "Internal server error" },
-      { status: error.message?.includes("Authorization") ? 401 : 500 }
+      { status: error.message?.includes("Authorization") ? 401 : 500 },
     );
   }
 }

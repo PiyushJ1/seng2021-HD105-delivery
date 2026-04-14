@@ -38,19 +38,18 @@ export async function GET(req: NextRequest) {
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
-
   } catch (error: any) {
     console.error("GET orders error:", error.message);
 
     return NextResponse.json(
       { detail: error.message || "Internal server error" },
-      { status: error.message?.includes("Authorization") ? 401 : 500 }
+      { status: error.message?.includes("Authorization") ? 401 : 500 },
     );
   }
 }
