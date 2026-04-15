@@ -136,19 +136,17 @@ export async function PUT(
     const newOnHand = (existingRow?.onHand ?? 0) - line.quantityCancelled;
     const newAvailable = (existingRow?.available ?? 0) - line.quantityCancelled;
 
-    await db
-      .collection("inventory")
-      .updateOne(
-        { warehouseId, binId, sku: line.sku },
-        {
-          $set: {
-            onHand: newOnHand,
-            available: newAvailable,
-            updatedAt: appliedAt,
-          },
+    await db.collection("inventory").updateOne(
+      { warehouseId, binId, sku: line.sku },
+      {
+        $set: {
+          onHand: newOnHand,
+          available: newAvailable,
+          updatedAt: appliedAt,
         },
-        { upsert: true },
-      );
+      },
+      { upsert: true },
+    );
 
     positionsUpdated.push({
       warehouseId,
