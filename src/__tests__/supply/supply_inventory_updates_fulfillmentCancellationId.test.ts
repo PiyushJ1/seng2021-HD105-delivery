@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 
 const BASE_URL = "/api/v2/supply/inventory-updates/cancellation";
 const client = new MongoClient(process.env.MONGODB_URI!);
-const db = client.db("test"); 
+const db = client.db("test");
 
 beforeEach(async () => {
   await db.collection("fulfilmentCancellations").deleteMany({});
@@ -20,14 +20,22 @@ afterAll(async () => {
 describe("PUT /api/v2/supply/inventory-updates/cancellation/{fulfilmentCancellationId}", () => {
   it("Returns 401 if auth token is missing", async () => {
     const res = await api.put(`${BASE_URL}/FC-TEST-401`).send({
-      warehouseId: "W-1", binId: "B-1", inventoryAdjustmentLines: [{ sku: "SKU-001", uom: "EA", quantityCancelled: 10 }],
+      warehouseId: "W-1",
+      binId: "B-1",
+      inventoryAdjustmentLines: [
+        { sku: "SKU-001", uom: "EA", quantityCancelled: 10 },
+      ],
     });
     expect(res.status).toBe(401);
   });
 
   it("Returns 400 if quantityCancelled is negative", async () => {
     const res = await api.put(`${BASE_URL}/FC-TEST-400-NEG`).send({
-      warehouseId: "W-1", binId: "B-1", inventoryAdjustmentLines: [{ sku: "SKU-001", uom: "EA", quantityCancelled: -1 }],
+      warehouseId: "W-1",
+      binId: "B-1",
+      inventoryAdjustmentLines: [
+        { sku: "SKU-001", uom: "EA", quantityCancelled: -1 },
+      ],
     });
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("negative quantityCancelled");
@@ -35,7 +43,11 @@ describe("PUT /api/v2/supply/inventory-updates/cancellation/{fulfilmentCancellat
 
   it("Returns 404 if fulfilment cancellation does not exist", async () => {
     const res = await api.put(`${BASE_URL}/FC-NOT-FOUND`).send({
-      warehouseId: "W-1", binId: "B-1", inventoryAdjustmentLines: [{ sku: "SKU-001", uom: "EA", quantityCancelled: 10 }],
+      warehouseId: "W-1",
+      binId: "B-1",
+      inventoryAdjustmentLines: [
+        { sku: "SKU-001", uom: "EA", quantityCancelled: 10 },
+      ],
     });
     expect(res.status).toBe(404);
   });
@@ -46,14 +58,23 @@ describe("PUT /api/v2/supply/inventory-updates/cancellation/{fulfilmentCancellat
       items: [{ sku: "SKU-001", uom: "EA", quantityCancelled: 50 }],
     });
     await db.collection("warehouses").insertOne({ warehouseId: "WH-7" });
-    await db.collection("bins").insertOne({ warehouseId: "WH-7", binId: "A1-03-02" });
+    await db
+      .collection("bins")
+      .insertOne({ warehouseId: "WH-7", binId: "A1-03-02" });
     await db.collection("inventory").insertOne({
-      warehouseId: "WH-7", binId: "A1-03-02", sku: "SKU-001", onHand: 150, available: 150
+      warehouseId: "WH-7",
+      binId: "A1-03-02",
+      sku: "SKU-001",
+      onHand: 150,
+      available: 150,
     });
 
     const res = await api.put(`${BASE_URL}/FC001`).send({
-      warehouseId: "WH-7", binId: "A1-03-02",
-      inventoryAdjustmentLines: [{ sku: "SKU-001", uom: "EA", quantityCancelled: 30 }],
+      warehouseId: "WH-7",
+      binId: "A1-03-02",
+      inventoryAdjustmentLines: [
+        { sku: "SKU-001", uom: "EA", quantityCancelled: 30 },
+      ],
     });
 
     expect(res.status).toBe(200);
