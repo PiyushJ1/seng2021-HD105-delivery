@@ -227,7 +227,7 @@ export function Layout({ children, currentView, onNavigate }: LayoutProps) {
                         JD
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col items-start text-left hidden sm:block">
+                    <div className="hidden flex-col items-start text-left sm:flex">
                       <span className="text-sm font-semibold text-slate-900 leading-none">
                         John Doe
                       </span>
@@ -270,7 +270,9 @@ export function Layout({ children, currentView, onNavigate }: LayoutProps) {
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 text-slate-900 md:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );
