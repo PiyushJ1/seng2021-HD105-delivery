@@ -6,7 +6,10 @@ import clientPromise from "@/src/lib/mongodb";
 // mock fetching order for now
 // TODO: fetch the actual order
 async function getOrder(orderId: string) {
-  return orderId === "abc123" || orderId === "xyz123" || orderId === "qwerty999"
+  return orderId === "abc123" ||
+    orderId === "xyz123" ||
+    orderId === "qwerty999" ||
+    orderId === "OL-001"
     ? { orderId }
     : null;
 }
