@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 type LoginResponse = {
@@ -11,6 +12,7 @@ type LoginResponse = {
 };
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,7 +56,8 @@ export default function LoginPage() {
         setPartyId(payload.partyId);
       }
 
-      setSuccessMessage(payload.message ?? "Logged in successfully!");
+      // setSuccessMessage(payload.message ?? "Logged in successfully!");
+      router.push("/dashboard");
     } catch {
       setErrorMessage(
         "Network error. Please check your connection and try again.",
