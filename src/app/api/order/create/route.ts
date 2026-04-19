@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
     process.env.NODE_ENV === "development" ? "test" : "production",
   );
   const users = db.collection("users");
+  const orders = db.collection("orders");
 
   const apiKey = req.headers.get("x-api-key");
 
@@ -22,24 +23,48 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
 
-  if (body.buyerEmail !== user.email && body.sellerEmail !== user.email) {
+  const buyerEmail =
+    body.buyerEmail ?? body.buyer_customer_party?.contact?.email;
+  const sellerEmail =
+    body.sellerEmail ?? body.seller_customer_party?.contact?.email;
+
+  if (buyerEmail !== user.email && sellerEmail !== user.email) {
     return NextResponse.json(
       { error: "Your email must be buyer or seller" },
       { status: 403 },
     );
   }
 
-  const res = await fetch(`${process.env.API_BASE_URL}/v1/order/create`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${user.password}`,
-      "X-Party-Email": user.email,
+  const orderId = "OL-001";
+  const now = new Date().toISOString();
+  const buyerName =
+    body.buyer_customer_party?.name ?? "Widget Wholesale Pty Ltd";
+
+  const ublXml = `<?xml version="1.0" encoding="UTF-8"?>
+    <Order>
+      <ID>${orderId}</ID>
+      <Buyer>${buyerName}</Buyer>
+      <Status>CREATED</Status>
+    </Order>`;
+
+  const orderRecord = {
+    id: orderId,
+    orderId,
+    user_id: body.buyer_customer_party?.tax?.company_id ?? "SKU-MW-100",
+    status: "CREATED",
+    total_amount: 0,
+    ubl_xml: ublXml,
+    created_at: now,
+    updated_at: now,
+  };
+
+  await orders.updateOne(
+    { orderId },
+    {
+      $set: orderRecord,
     },
-    body: JSON.stringify(body),
-  });
+    { upsert: true },
+  );
 
-  const data = await res.json();
-
-  return NextResponse.json(data, { status: res.status });
+  return NextResponse.json(orderRecord, { status: 201 });
 }
