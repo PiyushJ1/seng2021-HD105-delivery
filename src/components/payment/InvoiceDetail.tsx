@@ -10,6 +10,7 @@ import {
   Building2,
   Calendar,
   DollarSign,
+  Package,
 } from "lucide-react";
 import {
   Table,
@@ -31,7 +32,7 @@ import {
 } from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface InvoiceDetailProps {
   invoiceId?: string;
@@ -44,6 +45,18 @@ export function InvoiceDetail({
 }: InvoiceDetailProps) {
   const [approvalNotes, setApprovalNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [savedInvoice, setSavedInvoice] = useState<any>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("lastInvoice");
+    if (stored) {
+      try {
+        setSavedInvoice(JSON.parse(stored));
+      } catch (e) {
+        console.error("Failed to parse saved invoice", e);
+      }
+    }
+  }, []);
 
   const invoiceData = {
     id: invoiceId,
@@ -508,6 +521,22 @@ export function InvoiceDetail({
             <p className="text-sm text-gray-600">{invoiceData.notes}</p>
           </CardContent>
         </Card>
+
+        {savedInvoice && (
+          <Card className="mt-6 border-2 border-blue-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-600">
+                <Package className="h-5 w-5" />
+                Generated Invoice JSON
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-slate-50 p-4 rounded-lg overflow-x-auto text-xs font-mono">
+                {JSON.stringify(savedInvoice, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

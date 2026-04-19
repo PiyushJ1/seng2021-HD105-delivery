@@ -77,7 +77,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
     return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!supplier || !deliveryDate || !priority) {
@@ -95,13 +95,64 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
       return;
     }
 
-    toast.success("Order created successfully!", {
-      description: "The order has been sent to the supplier for confirmation.",
-    });
+    const apiKey = localStorage.getItem("apiKey");
+    if (!apiKey) {
+      toast.error("No API key found. Please log in again.");
+      return;
+    }
 
-    setTimeout(() => {
-      onNavigate("orders");
-    }, 1500);
+    try {
+      const response = await fetch("/api/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          buyer_customer_party: {
+            name: "Acme Corporation",
+            tax: { company_id: "ACME-001" },
+            contact: { email: "jane.smith@acme.com" },
+          },
+          seller_customer_party: {
+            name: supplier,
+            tax: { company_id: supplier },
+            contact: { email: `contact@${supplier}.com` },
+          },
+          order_date: new Date().toISOString().split("T")[0],
+          delivery_date: deliveryDate,
+          priority,
+          payment_terms: "net-30",
+          notes,
+          items: items.map((item) => ({
+            id: item.sku,
+            name: item.name,
+            quantity: item.quantity,
+            unit_price: item.unitPrice,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create order");
+      }
+
+      const orderData = await response.json();
+      localStorage.setItem("lastOrderId", orderData.orderId);
+
+      toast.success("Order created successfully!", {
+        description: `Order ID: ${orderData.orderId}`,
+      });
+
+      setTimeout(() => {
+        onNavigate("orders");
+      }, 1500);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create order",
+      );
+    }
   };
 
   return (
