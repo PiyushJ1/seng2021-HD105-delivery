@@ -29,8 +29,10 @@ import {
   RefreshCw,
   XCircle,
   FileCheck,
+  Truck,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
+import { toast } from "sonner";
 
 interface DocumentManagementProps {
   onNavigate: (view: string, id?: string) => void;
@@ -269,6 +271,142 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
 
   const statuses = [...new Set(currentDocs.map((d) => d.status))];
 
+  const handleCreateDespatchAdvice = async () => {
+    const apiKey = localStorage.getItem("apiKey");
+    const orderId = localStorage.getItem("lastOrderId");
+
+    if (!apiKey) {
+      toast.error("No API key found. Please log in again.");
+      return;
+    }
+
+    if (!orderId) {
+      toast.error("No order found. Please create an order first.");
+      return;
+    }
+
+    try {
+      toast.info("Creating despatch advice...", { duration: 2000 });
+
+      const despatchResponse = await fetch("/api/despatch-advice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          orderId: orderId,
+          supplierPartyId: "SUP-001",
+          deliveryPartyId: "DEL-001",
+          despatchDate: new Date().toISOString().split("T")[0],
+          items: [
+            { productId: "PROD-001", quantity: 10 },
+            { productId: "PROD-002", quantity: 5 },
+          ],
+        }),
+      });
+
+      if (!despatchResponse.ok) {
+        const error = await despatchResponse.json();
+        throw new Error(error.error || "Failed to create despatch advice");
+      }
+
+      const despatchData = await despatchResponse.json();
+      const despatchId = despatchData.despatchAdviceId;
+      toast.success("Despatch Advice created!", {
+        description: `ID: ${despatchId}`,
+      });
+
+      toast.info("Creating receipt advice...", { duration: 2000 });
+
+      const receiptResponse = await fetch("/api/receipt-advice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          despatchId: despatchId,
+          deliveryPartyId: "DEL-001",
+          receivedDate: new Date().toISOString().split("T")[0],
+          items: [
+            { productId: "PROD-001", quantityReceived: 5 },
+            { productId: "PROD-002", quantityReceived: 3 },
+          ],
+        }),
+      });
+
+      if (!receiptResponse.ok) {
+        const error = await receiptResponse.json();
+        throw new Error(error.error || "Failed to create receipt advice");
+      }
+
+      const receiptData = await receiptResponse.json();
+      const receiptAdviceId = receiptData.receiptAdviceId;
+      toast.success("Receipt Advice created!", {
+        description: `Status: ${receiptData.status}`,
+      });
+
+      if (receiptData.status === "Partial") {
+        toast.info("Updating receipt to Complete...", { duration: 2000 });
+
+        const updateResponse = await fetch(
+          `/api/receipt-advice/${receiptAdviceId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": apiKey,
+            },
+            body: JSON.stringify({
+              items: [
+                { productId: "PROD-001", quantityReceived: 10 },
+                { productId: "PROD-002", quantityReceived: 5 },
+              ],
+            }),
+          },
+        );
+
+        if (!updateResponse.ok) {
+          const error = await updateResponse.json();
+          throw new Error(error.error || "Failed to update receipt advice");
+        }
+
+        const updateData = await updateResponse.json();
+        toast.success("Receipt updated to Complete!", {
+          description: `Invoice ID: ${updateData.invoiceId}`,
+        });
+      }
+
+      const invoiceResponse = await fetch(
+        `/api/receipt-advice/${receiptAdviceId}/invoice`,
+        {
+          method: "GET",
+          headers: {
+            "x-api-key": apiKey,
+          },
+        },
+      );
+
+      if (!invoiceResponse.ok) {
+        const error = await invoiceResponse.json();
+        throw new Error(error.error || "Failed to fetch invoice");
+      }
+
+      const invoiceData = await invoiceResponse.json();
+      console.log("Final Invoice:", invoiceData);
+      localStorage.setItem("lastInvoice", JSON.stringify(invoiceData));
+
+      toast.success("Full workflow completed!", {
+        description: "Invoice data saved. View in Invoices page.",
+      });
+
+      onNavigate("invoices");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "An error occurred");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -281,9 +419,18 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
             Changes, and Order Cancellations
           </p>
         </div>
-        <Button className="gap-2" onClick={() => onNavigate("order-create")}>
-          <Plus className="h-4 w-4" /> New Order
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={handleCreateDespatchAdvice}
+          >
+            <Truck className="h-4 w-4" /> Create Despatch Advice
+          </Button>
+          <Button className="gap-2" onClick={() => onNavigate("order-create")}>
+            <Plus className="h-4 w-4" /> New Order
+          </Button>
+        </div>
       </div>
 
       {/* KPI Cards */}
