@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type RegisterResponse = {
   error?: string;
@@ -15,6 +16,7 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,8 +42,9 @@ export default function RegisterPage() {
         return;
       }
 
-      setSuccessMessage(payload.message ?? "Account registered successfully!");
+      // setSuccessMessage(payload.message ?? "Account registered successfully!");
       setPassword("");
+      router.push("/dashboard");
     } catch {
       setErrorMessage(
         "Network error. Please check your connection and try again.",
