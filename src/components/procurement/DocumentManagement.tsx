@@ -97,6 +97,14 @@ const mockDocuments: Record<
 > = {
   orders: [
     {
+      id: "PO-2026-0402",
+      reference: "REQ-8892",
+      supplier: "Tech Solutions Co",
+      date: "2026-04-21",
+      status: "Pending",
+      amount: "$1,330.00",
+    },
+    {
       id: "PO-2026-0401",
       reference: "REQ-8891",
       supplier: "Acme Corp",

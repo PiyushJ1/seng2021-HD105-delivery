@@ -112,7 +112,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
           buyer_customer_party: {
             name: "Acme Corporation",
             tax: { company_id: "ACME-001" },
-            contact: { email: "jane.smith@acme.com" },
+            contact: { email: localStorage.getItem("email") },
           },
           seller_customer_party: {
             name: supplier,
@@ -132,6 +132,8 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
           })),
         }),
       });
+
+      console.log(response)
 
       if (!response.ok) {
         const error = await response.json();
@@ -426,7 +428,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
               <Label htmlFor="buyer-name">Company Name</Label>
               <Input
                 id="buyer-name"
-                defaultValue="Acme Corporation"
+                defaultValue="Sam Holdings Pty Ltd"
                 readOnly
                 className="bg-gray-50"
               />
@@ -435,7 +437,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
               <Label htmlFor="buyer-contact">Contact Person</Label>
               <Input
                 id="buyer-contact"
-                defaultValue="Jane Smith"
+                defaultValue="Samridh Karol"
                 readOnly
                 className="bg-gray-50"
               />
@@ -445,7 +447,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
               <Input
                 id="buyer-email"
                 type="email"
-                defaultValue="jane.smith@acme.com"
+                defaultValue="sam@gmail.com"
                 readOnly
                 className="bg-gray-50"
               />
@@ -454,7 +456,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
               <Label htmlFor="buyer-phone">Phone</Label>
               <Input
                 id="buyer-phone"
-                defaultValue="+1 (555) 123-4567"
+                defaultValue="+61 412 345 678"
                 readOnly
                 className="bg-gray-50"
               />
