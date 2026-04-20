@@ -221,6 +221,7 @@ ${invoiceData.lineItems
                         placeholder="Enter reason for rejection..."
                         value={rejectionReason}
                         onChange={(e) => setRejectionReason(e.target.value)}
+                        className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                         rows={4}
                       />
                     </div>
@@ -278,6 +279,7 @@ ${invoiceData.lineItems
                         placeholder="Add any notes..."
                         value={approvalNotes}
                         onChange={(e) => setApprovalNotes(e.target.value)}
+                        className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                         rows={3}
                       />
                     </div>
