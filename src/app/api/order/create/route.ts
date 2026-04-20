@@ -28,13 +28,6 @@ export async function POST(req: NextRequest) {
   const sellerEmail =
     body.sellerEmail ?? body.seller_customer_party?.contact?.email;
 
-  if (buyerEmail !== user.email && sellerEmail !== user.email) {
-    return NextResponse.json(
-      { error: "Your email must be buyer or seller" },
-      { status: 403 },
-    );
-  }
-
   const orderId = "OL-001";
   const now = new Date().toISOString();
   const buyerName =
