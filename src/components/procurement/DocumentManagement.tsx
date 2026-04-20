@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { StatusBadge } from "../StatusBadge";
 import {
   Search,
@@ -31,7 +30,6 @@ import {
   FileCheck,
   Truck,
 } from "lucide-react";
-import { Badge } from "../ui/badge";
 import { toast } from "sonner";
 
 interface DocumentManagementProps {
@@ -263,6 +261,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
   const [activeTab, setActiveTab] = useState("orders");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isCreatingDespatch, setIsCreatingDespatch] = useState(false);
 
   const currentDocs = mockDocuments[activeTab] || [];
   const filtered = currentDocs.filter((doc) => {
@@ -279,14 +278,13 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
 
   const statuses = [...new Set(currentDocs.map((d) => d.status))];
 
-  const handleCreateDespatchAdvice = async () => {
-    const apiKey = localStorage.getItem("apiKey");
-    const orderId = localStorage.getItem("lastOrderId");
+  const wait = (ms: number) =>
+    new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
 
-    if (!apiKey) {
-      toast.error("No API key found. Please log in again.");
-      return;
-    }
+  const handleCreateDespatchAdvice = async () => {
+    const orderId = localStorage.getItem("lastOrderId");
 
     if (!orderId) {
       toast.error("No order found. Please create an order first.");
@@ -294,125 +292,71 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
     }
 
     try {
-      toast.info("Creating despatch advice...", { duration: 2000 });
+      setIsCreatingDespatch(true);
+      toast.info("Creating despatch advice...", { duration: 1200 });
+      await wait(700);
 
-      const despatchResponse = await fetch("/api/despatch-advice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          orderId: orderId,
-          supplierPartyId: "SUP-001",
-          deliveryPartyId: "DEL-001",
-          despatchDate: new Date().toISOString().split("T")[0],
-          items: [
-            { productId: "PROD-001", quantity: 10 },
-            { productId: "PROD-002", quantity: 5 },
-          ],
-        }),
-      });
-
-      if (!despatchResponse.ok) {
-        const error = await despatchResponse.json();
-        throw new Error(error.error || "Failed to create despatch advice");
-      }
-
-      const despatchData = await despatchResponse.json();
-      const despatchId = despatchData.despatchAdviceId;
+      const despatchId = "DA-2026-1001";
       toast.success("Despatch Advice created!", {
         description: `ID: ${despatchId}`,
       });
 
-      toast.info("Creating receipt advice...", { duration: 2000 });
+      toast.info("Creating receipt advice...", { duration: 1200 });
+      await wait(700);
 
-      const receiptResponse = await fetch("/api/receipt-advice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          despatchId: despatchId,
-          deliveryPartyId: "DEL-001",
-          receivedDate: new Date().toISOString().split("T")[0],
-          items: [
-            { productId: "PROD-001", quantityReceived: 5 },
-            { productId: "PROD-002", quantityReceived: 3 },
-          ],
-        }),
-      });
-
-      if (!receiptResponse.ok) {
-        const error = await receiptResponse.json();
-        throw new Error(error.error || "Failed to create receipt advice");
-      }
-
-      const receiptData = await receiptResponse.json();
-      const receiptAdviceId = receiptData.receiptAdviceId;
+      const receiptAdviceId = "RA-2026-1001";
       toast.success("Receipt Advice created!", {
-        description: `Status: ${receiptData.status}`,
+        description: "Status: Partial",
       });
 
-      if (receiptData.status === "Partial") {
-        toast.info("Updating receipt to Complete...", { duration: 2000 });
+      toast.info("Updating receipt to Complete...", { duration: 1200 });
+      await wait(700);
 
-        const updateResponse = await fetch(
-          `/api/receipt-advice/${receiptAdviceId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": apiKey,
-            },
-            body: JSON.stringify({
-              items: [
-                { productId: "PROD-001", quantityReceived: 10 },
-                { productId: "PROD-002", quantityReceived: 5 },
-              ],
-            }),
-          },
-        );
+      const invoiceId = "INV-2026-1001";
+      toast.success("Receipt updated to Complete!", {
+        description: `Invoice ID: ${invoiceId}`,
+      });
 
-        if (!updateResponse.ok) {
-          const error = await updateResponse.json();
-          throw new Error(error.error || "Failed to update receipt advice");
-        }
+      const today = new Date().toISOString().split("T")[0];
+      const dueDate = new Date(Date.now() + 30 * 24 * 3600 * 1000)
+        .toISOString()
+        .split("T")[0];
 
-        const updateData = await updateResponse.json();
-        toast.success("Receipt updated to Complete!", {
-          description: `Invoice ID: ${updateData.invoiceId}`,
-        });
-      }
+      const mockInvoice = {
+        id: invoiceId,
+        orderId,
+        supplier: "Tech Solutions Co",
+        issueDate: today,
+        dueDate,
+        amount: 1330,
+        status: "Pending",
+        overdue: false,
+        despatchId,
+        receiptAdviceId,
+      };
 
-      const invoiceResponse = await fetch(
-        `/api/receipt-advice/${receiptAdviceId}/invoice`,
-        {
-          method: "GET",
-          headers: {
-            "x-api-key": apiKey,
-          },
-        },
-      );
-
-      if (!invoiceResponse.ok) {
-        const error = await invoiceResponse.json();
-        throw new Error(error.error || "Failed to fetch invoice");
-      }
-
-      const invoiceData = await invoiceResponse.json();
-      console.log("Final Invoice:", invoiceData);
-      localStorage.setItem("lastInvoice", JSON.stringify(invoiceData));
+      localStorage.setItem("lastInvoice", JSON.stringify(mockInvoice));
 
       toast.success("Full workflow completed!", {
-        description: "Invoice data saved. View in Invoices page.",
+        description: "Mock invoice prepared. Opening Invoices.",
       });
 
       onNavigate("invoices");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsCreatingDespatch(false);
     }
+  };
+
+  const handleResetDemoData = () => {
+    localStorage.removeItem("lastOrderId");
+    localStorage.removeItem("lastOrder");
+    localStorage.removeItem("lastInvoice");
+
+    toast.success("Demo data reset", {
+      description: "Create a new order to start the flow again.",
+    });
   };
 
   return (
@@ -432,8 +376,21 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
             variant="outline"
             className="gap-2"
             onClick={handleCreateDespatchAdvice}
+            disabled={isCreatingDespatch}
           >
-            <Truck className="h-4 w-4" /> Create Despatch Advice
+            <Truck className="h-4 w-4" />
+            {isCreatingDespatch
+              ? "Creating Despatch..."
+              : "Create Despatch Advice"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-gray-500 hover:text-gray-700"
+            onClick={handleResetDemoData}
+            disabled={isCreatingDespatch}
+          >
+            Reset demo data
           </Button>
           <Button className="gap-2" onClick={() => onNavigate("order-create")}>
             <Plus className="h-4 w-4" /> New Order

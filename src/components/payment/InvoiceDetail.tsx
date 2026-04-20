@@ -32,12 +32,14 @@ import {
 } from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface InvoiceDetailProps {
   invoiceId?: string;
   onNavigate: (view: string) => void;
 }
+
+type SavedInvoice = Record<string, unknown>;
 
 export function InvoiceDetail({
   invoiceId = "INV-2026-0412",
@@ -45,18 +47,23 @@ export function InvoiceDetail({
 }: InvoiceDetailProps) {
   const [approvalNotes, setApprovalNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
-  const [savedInvoice, setSavedInvoice] = useState<any>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("lastInvoice");
-    if (stored) {
-      try {
-        setSavedInvoice(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse saved invoice", e);
-      }
+  const [savedInvoice] = useState<SavedInvoice | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
     }
-  }, []);
+
+    const stored = localStorage.getItem("lastInvoice");
+    if (!stored) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(stored) as SavedInvoice;
+    } catch (e) {
+      console.error("Failed to parse saved invoice", e);
+      return null;
+    }
+  });
 
   const invoiceData = {
     id: invoiceId,
@@ -138,6 +145,62 @@ export function InvoiceDetail({
   const tax = subtotal * 0.08;
   const shipping = 250.0;
   const total = subtotal + tax + shipping;
+  const ublInvoiceXml = `<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:ID>${invoiceData.id}</cbc:ID>
+  <cbc:IssueDate>${invoiceData.issueDate}</cbc:IssueDate>
+  <cbc:DueDate>${invoiceData.dueDate}</cbc:DueDate>
+  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+  <cbc:DocumentCurrencyCode>AUD</cbc:DocumentCurrencyCode>
+  <cac:OrderReference>
+    <cbc:ID>${invoiceData.orderId}</cbc:ID>
+  </cac:OrderReference>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cbc:EndpointID>${invoiceData.supplier.taxId}</cbc:EndpointID>
+      <cac:PartyName>
+        <cbc:Name>${invoiceData.supplier.name}</cbc:Name>
+      </cac:PartyName>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cbc:EndpointID>${invoiceData.buyer.taxId}</cbc:EndpointID>
+      <cac:PartyName>
+        <cbc:Name>${invoiceData.buyer.name}</cbc:Name>
+      </cac:PartyName>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:PaymentTerms>
+    <cbc:Note>${invoiceData.paymentTerms}</cbc:Note>
+  </cac:PaymentTerms>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="AUD">${tax.toFixed(2)}</cbc:TaxAmount>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="AUD">${subtotal.toFixed(2)}</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="AUD">${subtotal.toFixed(2)}</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="AUD">${(subtotal + tax).toFixed(2)}</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="AUD">${total.toFixed(2)}</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+${invoiceData.lineItems
+  .map(
+    (item) => `  <cac:InvoiceLine>
+    <cbc:ID>${item.id}</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="EA">${item.quantity}</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="AUD">${item.amount.toFixed(2)}</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Name>${item.description}</cbc:Name>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="AUD">${item.unitPrice.toFixed(2)}</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>`,
+  )
+  .join("\n")}
+</Invoice>`;
 
   return (
     <div className="space-y-6">
@@ -519,6 +582,20 @@ export function InvoiceDetail({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600">{invoiceData.notes}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2 border-2 border-indigo-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-indigo-600">
+              <FileText className="h-5 w-5" />
+              UBL Invoice XML
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <pre className="max-h-96 overflow-auto bg-slate-50 p-4 rounded-lg text-xs font-mono whitespace-pre">
+              {ublInvoiceXml}
+            </pre>
           </CardContent>
         </Card>
 
