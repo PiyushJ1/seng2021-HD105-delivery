@@ -42,35 +42,35 @@ const docTypes = [
     label: "Orders",
     icon: ShoppingCart,
     color: "blue",
-    count: 156,
+    count: 7,
   },
   {
     key: "order-responses",
     label: "Order Responses",
     icon: FileCheck,
     color: "green",
-    count: 89,
+    count: 4,
   },
   {
     key: "order-response-simple",
     label: "Order Response Simple",
     icon: FileText,
     color: "teal",
-    count: 42,
+    count: 3,
   },
   {
     key: "order-changes",
     label: "Order Changes",
     icon: RefreshCw,
     color: "orange",
-    count: 12,
+    count: 3,
   },
   {
     key: "order-cancellations",
     label: "Order Cancellations",
     icon: XCircle,
     color: "red",
-    count: 5,
+    count: 2,
   },
 ];
 
@@ -390,7 +390,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
             onClick={handleResetDemoData}
             disabled={isCreatingDespatch}
           >
-            Reset demo data
+            .
           </Button>
           <Button className="gap-2" onClick={() => onNavigate("order-create")}>
             <Plus className="h-4 w-4" /> New Order

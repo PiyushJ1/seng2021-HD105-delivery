@@ -761,7 +761,7 @@ ${invoiceData.lineItems
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 border-2 border-indigo-200">
+        <Card className="md:col-span-2 border border-indigo-100">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-indigo-600">
               <FileText className="h-5 w-5" />
@@ -776,7 +776,7 @@ ${invoiceData.lineItems
         </Card>
 
         {savedInvoice && (
-          <Card className="mt-6 border-2 border-blue-200">
+          <Card className="mt-6 border border-blue-100">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-blue-600">
                 <Package className="h-5 w-5" />
