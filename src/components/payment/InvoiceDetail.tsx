@@ -33,6 +33,7 @@ import {
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface InvoiceDetailProps {
   invoiceId?: string;
@@ -47,6 +48,7 @@ export function InvoiceDetail({
 }: InvoiceDetailProps) {
   const [approvalNotes, setApprovalNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [savedInvoice] = useState<SavedInvoice | null>(() => {
     if (typeof window === "undefined") {
       return null;
@@ -113,6 +115,205 @@ export function InvoiceDetail({
   const tax = subtotal * 0.08;
   const shipping = 250.0;
   const total = subtotal + tax + shipping;
+
+  const formatCurrency = (value: number) => {
+    return `$${value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsGeneratingPdf(true);
+
+      const { jsPDF } = await import("jspdf");
+      const pdf = new jsPDF({ unit: "pt", format: "a4" });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 40;
+      const rightEdge = pageWidth - margin;
+      let y = margin;
+
+      const ensureSpace = (requiredSpace = 24) => {
+        if (y + requiredSpace > pageHeight - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+      };
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(20);
+      pdf.text(`Invoice ${invoiceData.id}`, margin, y);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      y += 20;
+      pdf.text(`Order: ${invoiceData.orderId}`, margin, y);
+      pdf.text(`Issue: ${invoiceData.issueDate}`, margin + 180, y);
+      pdf.text(`Due: ${invoiceData.dueDate}`, margin + 320, y);
+
+      y += 16;
+      pdf.text(`Status: ${invoiceData.status}`, margin, y);
+      pdf.text(`Payment Terms: ${invoiceData.paymentTerms}`, margin + 180, y);
+
+      y += 12;
+      pdf.setDrawColor(203, 213, 225);
+      pdf.line(margin, y, rightEdge, y);
+
+      y += 20;
+      ensureSpace(120);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.text("Supplier", margin, y);
+      pdf.text("Buyer", margin + 280, y);
+
+      const supplierLines = [
+        invoiceData.supplier.name,
+        invoiceData.supplier.address,
+        `Tax ID: ${invoiceData.supplier.taxId}`,
+        `Email: ${invoiceData.supplier.email}`,
+        `Phone: ${invoiceData.supplier.phone}`,
+      ];
+
+      const buyerLines = [
+        invoiceData.buyer.name,
+        invoiceData.buyer.address,
+        `Tax ID: ${invoiceData.buyer.taxId}`,
+        `Email: ${invoiceData.buyer.email}`,
+        `Phone: ${invoiceData.buyer.phone}`,
+      ];
+
+      const supplierWrapped = supplierLines.flatMap(
+        (line) => pdf.splitTextToSize(line, 230) as string[],
+      );
+      const buyerWrapped = buyerLines.flatMap(
+        (line) => pdf.splitTextToSize(line, 230) as string[],
+      );
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      y += 16;
+      const infoRows = Math.max(supplierWrapped.length, buyerWrapped.length);
+
+      for (let i = 0; i < infoRows; i += 1) {
+        ensureSpace(14);
+        if (supplierWrapped[i]) {
+          pdf.text(supplierWrapped[i], margin, y);
+        }
+        if (buyerWrapped[i]) {
+          pdf.text(buyerWrapped[i], margin + 280, y);
+        }
+        y += 14;
+      }
+
+      y += 10;
+      ensureSpace(120);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.text("Line Items", margin, y);
+
+      const rowHeight = 20;
+      const tableWidth = rightEdge - margin;
+      const columns = {
+        description: margin + 6,
+        quantity: margin + 320,
+        unitPrice: margin + 385,
+        taxRate: margin + 450,
+        amount: rightEdge - 8,
+      };
+
+      y += 16;
+      pdf.setFillColor(241, 245, 249);
+      pdf.rect(margin, y - 12, tableWidth, rowHeight, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.text("Description", columns.description, y);
+      pdf.text("Qty", columns.quantity, y, { align: "right" });
+      pdf.text("Unit Price", columns.unitPrice, y, { align: "right" });
+      pdf.text("Tax", columns.taxRate, y, { align: "right" });
+      pdf.text("Amount", columns.amount, y, { align: "right" });
+
+      y += rowHeight;
+      pdf.setFont("helvetica", "normal");
+      invoiceData.lineItems.forEach((item, index) => {
+        ensureSpace(rowHeight + 8);
+
+        if (index % 2 === 1) {
+          pdf.setFillColor(248, 250, 252);
+          pdf.rect(margin, y - 12, tableWidth, rowHeight, "F");
+        }
+
+        const itemName =
+          (pdf.splitTextToSize(item.description, 260) as string[])[0] ?? "";
+        pdf.text(itemName, columns.description, y);
+        pdf.text(String(item.quantity), columns.quantity, y, {
+          align: "right",
+        });
+        pdf.text(formatCurrency(item.unitPrice), columns.unitPrice, y, {
+          align: "right",
+        });
+        pdf.text(`${(item.taxRate * 100).toFixed(0)}%`, columns.taxRate, y, {
+          align: "right",
+        });
+        pdf.text(formatCurrency(item.amount), columns.amount, y, {
+          align: "right",
+        });
+        y += rowHeight;
+      });
+
+      y += 12;
+      ensureSpace(100);
+      const totalsLabelX = rightEdge - 170;
+      const totalsValueX = rightEdge;
+
+      pdf.setFontSize(10);
+      pdf.text("Subtotal:", totalsLabelX, y);
+      pdf.text(formatCurrency(subtotal), totalsValueX, y, { align: "right" });
+
+      y += 14;
+      pdf.text("Tax (8%):", totalsLabelX, y);
+      pdf.text(formatCurrency(tax), totalsValueX, y, { align: "right" });
+
+      y += 14;
+      pdf.text("Shipping:", totalsLabelX, y);
+      pdf.text(formatCurrency(shipping), totalsValueX, y, { align: "right" });
+
+      y += 10;
+      pdf.line(totalsLabelX, y, totalsValueX, y);
+
+      y += 16;
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.text("Total Due:", totalsLabelX, y);
+      pdf.text(formatCurrency(total), totalsValueX, y, { align: "right" });
+
+      y += 24;
+      ensureSpace(70);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.text("Notes", margin, y);
+
+      y += 14;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      const noteLines = pdf.splitTextToSize(
+        invoiceData.notes,
+        rightEdge - margin,
+      );
+      pdf.text(noteLines, margin, y);
+
+      pdf.save(`${invoiceData.id}.pdf`);
+      toast.success("Invoice PDF downloaded successfully");
+    } catch (error) {
+      console.error("Failed to generate invoice PDF", error);
+      toast.error("Unable to generate PDF. Please try again.");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   const ublInvoiceXml = `<?xml version="1.0" encoding="UTF-8"?>
 <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
          xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
@@ -192,9 +393,14 @@ ${invoiceData.lineItems
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={handleDownloadPdf}
+            disabled={isGeneratingPdf}
+          >
             <Download className="h-4 w-4" />
-            Download PDF
+            {isGeneratingPdf ? "Generating PDF..." : "Download PDF"}
           </Button>
 
           {invoiceData.status === "Pending" && (
