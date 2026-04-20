@@ -298,7 +298,11 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" className="gap-2" onClick={loadDemoInvoices}>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={loadDemoInvoices}
+            >
               <RefreshCw className="h-4 w-4" />
               Refresh
             </Button>

@@ -91,7 +91,7 @@ export function InvoiceDetail({
         id: 1,
         description: "Wireless Office Keyboard",
         quantity: 10,
-        unitPrice: 100.00,
+        unitPrice: 100.0,
         taxRate: 0.08,
         amount: 1000.0,
       },
