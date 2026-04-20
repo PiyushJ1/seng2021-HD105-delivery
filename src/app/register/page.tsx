@@ -55,7 +55,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
+    <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900">
       <section className="mx-auto w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold">Register</h1>
         <p className="mt-1 text-sm text-slate-600">
@@ -75,7 +75,7 @@ export default function RegisterPage() {
               onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-slate-900"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
               placeholder="you@example.com"
             />
           </div>
@@ -95,7 +95,7 @@ export default function RegisterPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="new-password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-slate-900"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
               placeholder="Choose a password"
             />
           </div>
@@ -111,7 +111,7 @@ export default function RegisterPage() {
               onChange={(event) =>
                 setRole(event.target.value as "delivery" | "despatch")
               }
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-slate-900"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
             >
               <option value="delivery">delivery</option>
               <option value="despatch">despatch</option>
@@ -124,7 +124,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-slate-900 px-4 py-2 font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Registering..." : "Register"}
           </button>
@@ -144,7 +144,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-sm text-slate-600">
           Already registered?{" "}
-          <Link href="/login" className="font-medium text-slate-900 underline">
+          <Link href="/login" className="font-medium text-blue-600 underline">
             Go to login
           </Link>
         </p>

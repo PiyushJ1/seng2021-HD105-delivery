@@ -69,7 +69,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
+    <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900">
       <section className="mx-auto w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold">Log In</h1>
         <p className="mt-1 text-sm text-slate-600">
@@ -89,7 +89,7 @@ export default function LoginPage() {
               onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-slate-900"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
               placeholder="you@example.com"
             />
           </div>
@@ -109,7 +109,7 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="current-password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-slate-900"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
               placeholder="Enter your password"
             />
           </div>
@@ -117,7 +117,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-slate-900 px-4 py-2 font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Logging in..." : "Log In"}
           </button>
@@ -149,7 +149,7 @@ export default function LoginPage() {
           New here?{" "}
           <Link
             href="/register"
-            className="font-medium text-slate-900 underline"
+            className="font-medium text-blue-600 underline"
           >
             Create an account
           </Link>
