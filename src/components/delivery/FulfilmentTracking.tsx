@@ -141,10 +141,10 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-semibold text-gray-900">
+        <h1 className="text-3xl font-semibold text-slate-900">
           Fulfilment Tracking
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-slate-500 mt-1">
           Track shipments and delivery status in real-time
         </p>
       </div>
@@ -153,7 +153,7 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
       <Card>
         <CardContent className="p-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Search by shipment ID, order ID, or tracking number..."
               className="pl-10"
@@ -176,20 +176,20 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
           {/* Shipment Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Order ID</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-sm text-slate-500 mb-1">Order ID</p>
+              <p className="font-medium text-slate-900">
                 {selectedShipment.orderId}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">Carrier</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-sm text-slate-500 mb-1">Carrier</p>
+              <p className="font-medium text-slate-900">
                 {selectedShipment.carrier}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">Tracking Number</p>
-              <p className="font-mono text-sm text-gray-900">
+              <p className="text-sm text-slate-500 mb-1">Tracking Number</p>
+              <p className="font-mono text-sm text-slate-900">
                 {selectedShipment.trackingNumber}
               </p>
             </div>
@@ -198,8 +198,8 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Delivery Progress</span>
-              <span className="font-medium text-gray-900">
+              <span className="text-slate-600">Delivery Progress</span>
+              <span className="font-medium text-slate-900">
                 {selectedShipment.progress}%
               </span>
             </div>
@@ -207,22 +207,22 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
           </div>
 
           {/* Route Information */}
-          <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+          <div className="flex items-center justify-between bg-slate-50 rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                <MapPin className="h-5 w-5 text-blue-600" />
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-sky-100">
+                <MapPin className="h-5 w-5 text-sky-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Origin</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-sm text-slate-500">Origin</p>
+                <p className="font-medium text-slate-900">
                   {selectedShipment.origin}
                 </p>
               </div>
             </div>
 
             <div className="flex-1 flex items-center justify-center">
-              <div className="w-full max-w-xs border-t-2 border-dashed border-gray-300 relative">
-                <Truck className="absolute top-1/2 left-2/3 -translate-y-1/2 h-5 w-5 text-blue-600" />
+              <div className="w-full max-w-xs border-t-2 border-dashed border-slate-300 relative">
+                <Truck className="absolute top-1/2 left-2/3 -translate-y-1/2 h-5 w-5 text-sky-600" />
               </div>
             </div>
 
@@ -231,8 +231,8 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
                 <MapPin className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Destination</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-sm text-slate-500">Destination</p>
+                <p className="font-medium text-slate-900">
                   {selectedShipment.destination}
                 </p>
               </div>
@@ -240,21 +240,21 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
           </div>
 
           {/* Current Status */}
-          <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between bg-sky-50 border border-sky-200 rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <Package className="h-5 w-5 text-blue-600" />
+              <Package className="h-5 w-5 text-sky-600" />
               <div>
-                <p className="text-sm text-blue-600 font-medium">
+                <p className="text-sm text-sky-600 font-medium">
                   Current Location
                 </p>
-                <p className="text-gray-900">
+                <p className="text-slate-900">
                   {selectedShipment.currentLocation}
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-500">Estimated Delivery</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-sm text-slate-500">Estimated Delivery</p>
+              <p className="font-medium text-slate-900">
                 {selectedShipment.estimatedDelivery}
               </p>
             </div>
@@ -262,7 +262,7 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
 
           {/* Tracking Events */}
           <div>
-            <h4 className="font-semibold text-gray-900 mb-4">
+            <h4 className="font-semibold text-slate-900 mb-4">
               Tracking History
             </h4>
             <div className="space-y-4">
@@ -271,29 +271,29 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
                   <div className="flex flex-col items-center">
                     <div
                       className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                        event.completed ? "bg-green-100" : "bg-gray-100"
+                        event.completed ? "bg-green-100" : "bg-slate-100"
                       }`}
                     >
                       {event.completed ? (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : (
-                        <Clock className="h-5 w-5 text-gray-400" />
+                        <Clock className="h-5 w-5 text-slate-400" />
                       )}
                     </div>
                     {index < trackingEvents.length - 1 && (
                       <div
                         className={`w-0.5 h-12 my-1 ${
-                          event.completed ? "bg-green-200" : "bg-gray-200"
+                          event.completed ? "bg-green-200" : "bg-slate-200"
                         }`}
                       />
                     )}
                   </div>
                   <div className="flex-1 pb-4">
-                    <p className="font-medium text-gray-900">{event.status}</p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="font-medium text-slate-900">{event.status}</p>
+                    <p className="text-sm text-slate-600 mt-1">
                       {event.description}
                     </p>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-2 mt-2 text-sm text-slate-500">
                       <MapPin className="h-3 w-3" />
                       <span>{event.location}</span>
                       <span>•</span>
@@ -327,7 +327,7 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
             </TableHeader>
             <TableBody>
               {filteredShipments.map((shipment) => (
-                <TableRow key={shipment.id} className="hover:bg-gray-50">
+                <TableRow key={shipment.id} className="hover:bg-slate-50">
                   <TableCell className="font-medium">{shipment.id}</TableCell>
                   <TableCell>{shipment.orderId}</TableCell>
                   <TableCell>{shipment.carrier}</TableCell>
@@ -341,7 +341,7 @@ export function FulfilmentTracking({ onNavigate }: FulfilmentTrackingProps) {
                         value={shipment.progress}
                         className="h-2 w-20"
                       />
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-slate-600">
                         {shipment.progress}%
                       </span>
                     </div>

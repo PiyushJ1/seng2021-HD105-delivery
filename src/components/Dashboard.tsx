@@ -52,8 +52,8 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       value: "1,247",
       change: "+12.5%",
       icon: ShoppingCart,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
+      color: "text-sky-600",
+      bgColor: "bg-sky-50",
       delay: 0.1,
     },
     {
@@ -147,7 +147,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "order":
-        return <ShoppingCart className="h-4 w-4 text-indigo-500" />;
+        return <ShoppingCart className="h-4 w-4 text-sky-500" />;
       case "delivery":
         return <Truck className="h-4 w-4 text-amber-500" />;
       case "invoice":
@@ -169,7 +169,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       >
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Activity className="h-5 w-5 text-indigo-600" />
+            <Activity className="h-5 w-5 text-sky-600" />
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               Dashboard Overview
             </h1>
@@ -245,7 +245,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4 relative z-10">
               <div className="flex-1 text-center w-full md:w-auto flex flex-col items-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 text-indigo-600 mb-3 border border-indigo-100">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-sky-50 text-sky-600 mb-3 border border-sky-100">
                   <ShoppingCart className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold text-slate-900">Procurement</h3>
@@ -377,7 +377,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                     Items needing attention
                   </CardDescription>
                 </div>
-                <span className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-md font-semibold border border-indigo-100">
+                <span className="bg-sky-50 text-sky-700 text-xs px-2 py-1 rounded-md font-semibold border border-sky-100">
                   3 New
                 </span>
               </div>
@@ -386,7 +386,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               {alerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className="group relative flex flex-col gap-2 p-3.5 rounded-md border border-slate-200 hover:border-indigo-200 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="group relative flex flex-col gap-2 p-3.5 rounded-md border border-slate-200 hover:border-sky-200 hover:bg-slate-50 transition-colors cursor-pointer"
                   onClick={() => onNavigate(alert.view)}
                 >
                   <div className="flex gap-3 items-start">
@@ -414,7 +414,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                     </div>
                   </div>
                   <div className="flex justify-end mt-1">
-                    <span className="text-xs font-semibold text-indigo-600 flex items-center gap-1 group-hover:text-indigo-700">
+                    <span className="text-xs font-semibold text-sky-600 flex items-center gap-1 group-hover:text-sky-700">
                       {alert.action} <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
@@ -444,7 +444,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </div>
               <Button
                 variant="ghost"
-                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-md font-medium text-sm"
+                className="text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-md font-medium text-sm"
               >
                 View All
               </Button>

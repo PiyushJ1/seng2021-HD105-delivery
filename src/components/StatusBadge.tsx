@@ -45,7 +45,7 @@ export function StatusBadge({ status, type = "order" }: StatusBadgeProps) {
       normalizedStatus.includes("shipped") ||
       normalizedStatus.includes("issued")
     ) {
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "bg-sky-50 text-sky-700 border-sky-200";
     }
 
     if (

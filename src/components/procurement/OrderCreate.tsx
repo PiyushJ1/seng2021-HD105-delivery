@@ -148,10 +148,10 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-semibold text-gray-900">
+            <h1 className="text-3xl font-semibold text-slate-900">
               Create Purchase Order
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-slate-500 mt-1">
               Fill in the details to create a new purchase order
             </p>
           </div>
@@ -367,25 +367,25 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
           <div className="flex justify-end">
             <div className="w-80 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Subtotal:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Subtotal:</span>
+                <span className="text-slate-900">
                   ${calculateTotal().toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Tax (8%):</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Tax (8%):</span>
+                <span className="text-slate-900">
                   ${(calculateTotal() * 0.08).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Shipping (est.):</span>
-                <span className="text-gray-900">$250.00</span>
+                <span className="text-slate-500">Shipping (est.):</span>
+                <span className="text-slate-900">$250.00</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-900">Total:</span>
-                <span className="text-xl font-semibold text-gray-900">
+                <span className="font-semibold text-slate-900">Total:</span>
+                <span className="text-xl font-semibold text-slate-900">
                   ${(calculateTotal() * 1.08 + 250).toFixed(2)}
                 </span>
               </div>
@@ -407,7 +407,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
                 id="buyer-name"
                 defaultValue="Sam Holdings Pty Ltd"
                 readOnly
-                className="bg-gray-50"
+                className="bg-slate-50"
               />
             </div>
             <div className="space-y-2">
@@ -416,7 +416,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
                 id="buyer-contact"
                 defaultValue="Samridh Karol"
                 readOnly
-                className="bg-gray-50"
+                className="bg-slate-50"
               />
             </div>
             <div className="space-y-2">
@@ -426,7 +426,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
                 type="email"
                 defaultValue="sam@gmail.com"
                 readOnly
-                className="bg-gray-50"
+                className="bg-slate-50"
               />
             </div>
             <div className="space-y-2">
@@ -435,7 +435,7 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
                 id="buyer-phone"
                 defaultValue="+61 412 345 678"
                 readOnly
-                className="bg-gray-50"
+                className="bg-slate-50"
               />
             </div>
           </div>

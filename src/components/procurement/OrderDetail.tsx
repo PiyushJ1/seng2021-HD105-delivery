@@ -156,8 +156,8 @@ export function OrderDetail({
         );
       default:
         return (
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100">
-            <Clock className="h-5 w-5 text-gray-400" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100">
+            <Clock className="h-5 w-5 text-slate-400" />
           </div>
         );
     }
@@ -176,7 +176,7 @@ export function OrderDetail({
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-semibold text-gray-900">
+            <h1 className="text-3xl font-semibold text-slate-900">
               {orderData.id}
             </h1>
             <div className="flex items-center gap-3 mt-1">
@@ -221,25 +221,25 @@ export function OrderDetail({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Package className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-sky-100 rounded-lg">
+                <Package className="h-5 w-5 text-sky-600" />
               </div>
-              <h3 className="font-semibold text-gray-900">Order Details</h3>
+              <h3 className="font-semibold text-slate-900">Order Details</h3>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Created Date:</span>
-                <span className="text-gray-900">{orderData.createdDate}</span>
+                <span className="text-slate-500">Created Date:</span>
+                <span className="text-slate-900">{orderData.createdDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Expected Delivery:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Expected Delivery:</span>
+                <span className="text-slate-900">
                   {orderData.expectedDelivery}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Total Items:</span>
-                <span className="text-gray-900">{orderData.items.length}</span>
+                <span className="text-slate-500">Total Items:</span>
+                <span className="text-slate-900">{orderData.items.length}</span>
               </div>
             </div>
           </CardContent>
@@ -251,15 +251,17 @@ export function OrderDetail({
               <div className="p-2 bg-purple-100 rounded-lg">
                 <FileText className="h-5 w-5 text-purple-600" />
               </div>
-              <h3 className="font-semibold text-gray-900">Buyer Information</h3>
+              <h3 className="font-semibold text-slate-900">
+                Buyer Information
+              </h3>
             </div>
             <div className="space-y-2 text-sm">
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-slate-900">
                 {orderData.buyer.name}
               </p>
-              <p className="text-gray-600">{orderData.buyer.contactPerson}</p>
-              <p className="text-gray-600">{orderData.buyer.email}</p>
-              <p className="text-gray-600">{orderData.buyer.phone}</p>
+              <p className="text-slate-600">{orderData.buyer.contactPerson}</p>
+              <p className="text-slate-600">{orderData.buyer.email}</p>
+              <p className="text-slate-600">{orderData.buyer.phone}</p>
             </div>
           </CardContent>
         </Card>
@@ -270,19 +272,19 @@ export function OrderDetail({
               <div className="p-2 bg-green-100 rounded-lg">
                 <FileText className="h-5 w-5 text-green-600" />
               </div>
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-slate-900">
                 Supplier Information
               </h3>
             </div>
             <div className="space-y-2 text-sm">
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-slate-900">
                 {orderData.supplier.name}
               </p>
-              <p className="text-gray-600">
+              <p className="text-slate-600">
                 {orderData.supplier.contactPerson}
               </p>
-              <p className="text-gray-600">{orderData.supplier.email}</p>
-              <p className="text-gray-600">{orderData.supplier.phone}</p>
+              <p className="text-slate-600">{orderData.supplier.email}</p>
+              <p className="text-slate-600">{orderData.supplier.phone}</p>
             </div>
           </CardContent>
         </Card>
@@ -328,21 +330,21 @@ export function OrderDetail({
           <div className="flex justify-end">
             <div className="w-80 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Subtotal:</span>
-                <span className="text-gray-900">${subtotal.toFixed(2)}</span>
+                <span className="text-slate-500">Subtotal:</span>
+                <span className="text-slate-900">${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Tax (8%):</span>
-                <span className="text-gray-900">${tax.toFixed(2)}</span>
+                <span className="text-slate-500">Tax (8%):</span>
+                <span className="text-slate-900">${tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Shipping:</span>
-                <span className="text-gray-900">${shipping.toFixed(2)}</span>
+                <span className="text-slate-500">Shipping:</span>
+                <span className="text-slate-900">${shipping.toFixed(2)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-900">Total:</span>
-                <span className="text-xl font-semibold text-gray-900">
+                <span className="font-semibold text-slate-900">Total:</span>
+                <span className="text-xl font-semibold text-slate-900">
                   ${total.toFixed(2)}
                 </span>
               </div>
@@ -363,17 +365,19 @@ export function OrderDetail({
                 <div className="flex flex-col items-center">
                   {getTimelineIcon(event.status)}
                   {index < orderData.timeline.length - 1 && (
-                    <div className="w-0.5 h-12 bg-gray-200 my-2" />
+                    <div className="w-0.5 h-12 bg-slate-200 my-2" />
                   )}
                 </div>
                 <div className="flex-1 pb-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">{event.event}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="font-medium text-slate-900">
+                        {event.event}
+                      </p>
+                      <p className="text-sm text-slate-500 mt-1">
                         {event.date} at {event.time}
                       </p>
-                      <p className="text-sm text-gray-500">by {event.user}</p>
+                      <p className="text-sm text-slate-500">by {event.user}</p>
                     </div>
                     <StatusBadge
                       status={

@@ -75,7 +75,7 @@ export default function RegisterPage() {
               onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-sky-600"
               placeholder="you@example.com"
             />
           </div>
@@ -95,7 +95,7 @@ export default function RegisterPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="new-password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-sky-600"
               placeholder="Choose a password"
             />
           </div>
@@ -111,7 +111,7 @@ export default function RegisterPage() {
               onChange={(event) =>
                 setRole(event.target.value as "delivery" | "despatch")
               }
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-sky-600"
             >
               <option value="delivery">delivery</option>
               <option value="despatch">despatch</option>
@@ -124,7 +124,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg bg-sky-600 px-4 py-2 font-medium text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Registering..." : "Register"}
           </button>
@@ -144,7 +144,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-sm text-slate-600">
           Already registered?{" "}
-          <Link href="/login" className="font-medium text-blue-600 underline">
+          <Link href="/login" className="font-medium text-sky-600 underline">
             Go to login
           </Link>
         </p>

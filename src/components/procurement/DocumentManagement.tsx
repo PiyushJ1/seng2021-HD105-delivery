@@ -75,7 +75,7 @@ const docTypes = [
 ];
 
 const colorMap: Record<string, { bg: string; text: string }> = {
-  blue: { bg: "bg-blue-100", text: "text-blue-600" },
+  blue: { bg: "bg-sky-100", text: "text-sky-600" },
   green: { bg: "bg-green-100", text: "text-green-600" },
   teal: { bg: "bg-teal-100", text: "text-teal-600" },
   orange: { bg: "bg-orange-100", text: "text-orange-600" },
@@ -363,10 +363,10 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-gray-900">
+          <h1 className="text-3xl font-semibold text-slate-900">
             Procurement Documents
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-slate-500 mt-1">
             Manage Orders, Order Responses, Order Response Simple, Order
             Changes, and Order Cancellations
           </p>
@@ -386,7 +386,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs text-gray-500 hover:text-gray-700"
+            className="text-xs text-slate-500 hover:text-slate-700"
             onClick={handleResetDemoData}
             disabled={isCreatingDespatch}
           >
@@ -405,7 +405,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
           return (
             <Card
               key={dt.key}
-              className={`cursor-pointer transition-shadow hover:shadow-md ${activeTab === dt.key ? "ring-2 ring-blue-500" : ""}`}
+              className={`cursor-pointer transition-shadow hover:shadow-md ${activeTab === dt.key ? "ring-2 ring-sky-500" : ""}`}
               onClick={() => {
                 setActiveTab(dt.key);
                 setSearchQuery("");
@@ -418,8 +418,8 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
                     <dt.icon className={`h-4 w-4 ${c.text}`} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{dt.label}</p>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500">{dt.label}</p>
+                    <p className="text-xl font-semibold text-slate-900">
                       {dt.count}
                     </p>
                   </div>
@@ -446,7 +446,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
         <CardContent>
           <div className="flex items-center gap-4 mb-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search by ID, reference, or supplier..."
                 className="pl-10"
@@ -483,7 +483,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
             </TableHeader>
             <TableBody>
               {filtered.map((doc) => (
-                <TableRow key={doc.id} className="hover:bg-gray-50">
+                <TableRow key={doc.id} className="hover:bg-slate-50">
                   <TableCell className="font-medium">{doc.id}</TableCell>
                   <TableCell>{doc.reference}</TableCell>
                   <TableCell>{doc.supplier}</TableCell>
@@ -511,7 +511,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
                 <TableRow>
                   <TableCell
                     colSpan={7}
-                    className="text-center py-8 text-gray-500"
+                    className="text-center py-8 text-slate-500"
                   >
                     No documents found matching your criteria.
                   </TableCell>

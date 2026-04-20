@@ -384,7 +384,7 @@ ${invoiceData.lineItems
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-semibold text-gray-900">
+            <h1 className="text-3xl font-semibold text-slate-900">
               {invoiceData.id}
             </h1>
             <div className="flex items-center gap-3 mt-1">
@@ -454,9 +454,9 @@ ${invoiceData.lineItems
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                    <div className="bg-slate-50 rounded-lg p-4 space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-slate-500">
                           Invoice Amount:
                         </span>
                         <span className="font-semibold">
@@ -464,13 +464,17 @@ ${invoiceData.lineItems
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-500">Due Date:</span>
+                        <span className="text-sm text-slate-500">
+                          Due Date:
+                        </span>
                         <span className="font-semibold">
                           {invoiceData.dueDate}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-500">Supplier:</span>
+                        <span className="text-sm text-slate-500">
+                          Supplier:
+                        </span>
                         <span className="font-semibold">
                           {invoiceData.supplier.name}
                         </span>
@@ -506,12 +510,12 @@ ${invoiceData.lineItems
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileText className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-sky-100 rounded-lg">
+                <FileText className="h-5 w-5 text-sky-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Order Reference</p>
-                <p className="font-semibold text-gray-900">
+                <p className="text-sm text-slate-500">Order Reference</p>
+                <p className="font-semibold text-slate-900">
                   {invoiceData.orderId}
                 </p>
               </div>
@@ -526,8 +530,8 @@ ${invoiceData.lineItems
                 <Calendar className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Issue Date</p>
-                <p className="font-semibold text-gray-900">
+                <p className="text-sm text-slate-500">Issue Date</p>
+                <p className="font-semibold text-slate-900">
                   {invoiceData.issueDate}
                 </p>
               </div>
@@ -542,8 +546,8 @@ ${invoiceData.lineItems
                 <Calendar className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Due Date</p>
-                <p className="font-semibold text-gray-900">
+                <p className="text-sm text-slate-500">Due Date</p>
+                <p className="font-semibold text-slate-900">
                   {invoiceData.dueDate}
                 </p>
               </div>
@@ -558,8 +562,8 @@ ${invoiceData.lineItems
                 <DollarSign className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Amount</p>
-                <p className="text-xl font-semibold text-gray-900">
+                <p className="text-sm text-slate-500">Total Amount</p>
+                <p className="text-xl font-semibold text-slate-900">
                   ${total.toFixed(2)}
                 </p>
               </div>
@@ -579,30 +583,30 @@ ${invoiceData.lineItems
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-slate-900">
                 {invoiceData.supplier.name}
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 {invoiceData.supplier.address}
               </p>
             </div>
             <Separator />
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Tax ID:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Tax ID:</span>
+                <span className="text-slate-900">
                   {invoiceData.supplier.taxId}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Email:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Email:</span>
+                <span className="text-slate-900">
                   {invoiceData.supplier.email}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Phone:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Phone:</span>
+                <span className="text-slate-900">
                   {invoiceData.supplier.phone}
                 </span>
               </div>
@@ -619,26 +623,32 @@ ${invoiceData.lineItems
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-slate-900">
                 {invoiceData.buyer.name}
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 {invoiceData.buyer.address}
               </p>
             </div>
             <Separator />
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Tax ID:</span>
-                <span className="text-gray-900">{invoiceData.buyer.taxId}</span>
+                <span className="text-slate-500">Tax ID:</span>
+                <span className="text-slate-900">
+                  {invoiceData.buyer.taxId}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Email:</span>
-                <span className="text-gray-900">{invoiceData.buyer.email}</span>
+                <span className="text-slate-500">Email:</span>
+                <span className="text-slate-900">
+                  {invoiceData.buyer.email}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Phone:</span>
-                <span className="text-gray-900">{invoiceData.buyer.phone}</span>
+                <span className="text-slate-500">Phone:</span>
+                <span className="text-slate-900">
+                  {invoiceData.buyer.phone}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -685,23 +695,23 @@ ${invoiceData.lineItems
           <div className="flex justify-end">
             <div className="w-80 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Subtotal:</span>
-                <span className="text-gray-900">${subtotal.toFixed(2)}</span>
+                <span className="text-slate-500">Subtotal:</span>
+                <span className="text-slate-900">${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Tax (8%):</span>
-                <span className="text-gray-900">${tax.toFixed(2)}</span>
+                <span className="text-slate-500">Tax (8%):</span>
+                <span className="text-slate-900">${tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Shipping:</span>
-                <span className="text-gray-900">${shipping.toFixed(2)}</span>
+                <span className="text-slate-500">Shipping:</span>
+                <span className="text-slate-900">${shipping.toFixed(2)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-slate-900">
                   Total Amount Due:
                 </span>
-                <span className="text-xl font-semibold text-gray-900">
+                <span className="text-xl font-semibold text-slate-900">
                   ${total.toFixed(2)}
                 </span>
               </div>
@@ -719,32 +729,32 @@ ${invoiceData.lineItems
           <CardContent className="space-y-3">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Payment Terms:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Payment Terms:</span>
+                <span className="text-slate-900">
                   {invoiceData.paymentTerms}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Account Name:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Account Name:</span>
+                <span className="text-slate-900">
                   {invoiceData.bankDetails.accountName}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Bank Name:</span>
-                <span className="text-gray-900">
+                <span className="text-slate-500">Bank Name:</span>
+                <span className="text-slate-900">
                   {invoiceData.bankDetails.bankName}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Account Number:</span>
-                <span className="text-gray-900 font-mono">
+                <span className="text-slate-500">Account Number:</span>
+                <span className="text-slate-900 font-mono">
                   {invoiceData.bankDetails.accountNumber}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Routing Number:</span>
-                <span className="text-gray-900 font-mono">
+                <span className="text-slate-500">Routing Number:</span>
+                <span className="text-slate-900 font-mono">
                   {invoiceData.bankDetails.routingNumber}
                 </span>
               </div>
@@ -757,13 +767,13 @@ ${invoiceData.lineItems
             <CardTitle>Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600">{invoiceData.notes}</p>
+            <p className="text-sm text-slate-600">{invoiceData.notes}</p>
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 border border-indigo-100">
+        <Card className="md:col-span-2 border border-sky-100">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-indigo-600">
+            <CardTitle className="flex items-center gap-2 text-sky-600">
               <FileText className="h-5 w-5" />
               UBL Invoice XML
             </CardTitle>
@@ -776,9 +786,9 @@ ${invoiceData.lineItems
         </Card>
 
         {savedInvoice && (
-          <Card className="mt-6 border border-blue-100">
+          <Card className="mt-6 border border-sky-100">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-600">
+              <CardTitle className="flex items-center gap-2 text-sky-600">
                 <Package className="h-5 w-5" />
                 Generated Invoice JSON
               </CardTitle>

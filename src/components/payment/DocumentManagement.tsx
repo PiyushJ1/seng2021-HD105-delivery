@@ -67,7 +67,7 @@ const docTypes = [
 ];
 
 const colorMap: Record<string, { bg: string; text: string }> = {
-  blue: { bg: "bg-blue-100", text: "text-blue-600" },
+  blue: { bg: "bg-sky-100", text: "text-sky-600" },
   green: { bg: "bg-green-100", text: "text-green-600" },
   orange: { bg: "bg-orange-100", text: "text-orange-600" },
   purple: { bg: "bg-purple-100", text: "text-purple-600" },
@@ -277,23 +277,23 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold text-gray-900">
+        <h1 className="text-3xl font-semibold text-slate-900">
           Payment Documents
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-slate-500 mt-1">
           Manage Invoices (E-Invoices), Credit Notes, Debit Notes, and
           Application Responses
         </p>
       </div>
 
       {/* E-Invoice highlight banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center gap-3">
-        <Zap className="h-5 w-5 text-blue-600 shrink-0" />
+      <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 flex items-center gap-3">
+        <Zap className="h-5 w-5 text-sky-600 shrink-0" />
         <div>
-          <p className="text-sm text-blue-900 font-medium">
+          <p className="text-sm text-sky-900 font-medium">
             E-Invoice Processing Active
           </p>
-          <p className="text-sm text-blue-700">
+          <p className="text-sm text-sky-700">
             {mockDocuments.invoices.filter((i) => i.eInvoice).length} of{" "}
             {mockDocuments.invoices.length} invoices are e-invoices with
             automated validation and compliance checks.
@@ -308,7 +308,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
           return (
             <Card
               key={dt.key}
-              className={`cursor-pointer transition-shadow hover:shadow-md ${activeTab === dt.key ? "ring-2 ring-blue-500" : ""} ${dt.highlight ? "border-blue-200" : ""}`}
+              className={`cursor-pointer transition-shadow hover:shadow-md ${activeTab === dt.key ? "ring-2 ring-sky-500" : ""} ${dt.highlight ? "border-sky-200" : ""}`}
               onClick={() => {
                 setActiveTab(dt.key);
                 setSearchQuery("");
@@ -321,8 +321,8 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
                     <dt.icon className={`h-4 w-4 ${c.text}`} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{dt.label}</p>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500">{dt.label}</p>
+                    <p className="text-xl font-semibold text-slate-900">
                       {dt.count}
                     </p>
                   </div>
@@ -349,7 +349,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
         <CardContent>
           <div className="flex items-center gap-4 mb-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search by ID, reference, or party..."
                 className="pl-10"
@@ -387,7 +387,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
             </TableHeader>
             <TableBody>
               {filtered.map((doc) => (
-                <TableRow key={doc.id} className="hover:bg-gray-50">
+                <TableRow key={doc.id} className="hover:bg-slate-50">
                   <TableCell className="font-medium">{doc.id}</TableCell>
                   <TableCell>{doc.reference}</TableCell>
                   <TableCell>{doc.party}</TableCell>
@@ -399,11 +399,11 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
                   {activeTab === "invoices" && (
                     <TableCell>
                       {doc.eInvoice ? (
-                        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 gap-1">
+                        <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-100 gap-1">
                           <Zap className="h-3 w-3" /> E-Invoice
                         </Badge>
                       ) : (
-                        <span className="text-xs text-gray-400">Manual</span>
+                        <span className="text-xs text-slate-400">Manual</span>
                       )}
                     </TableCell>
                   )}
@@ -426,7 +426,7 @@ export function DocumentManagement({ onNavigate }: DocumentManagementProps) {
                 <TableRow>
                   <TableCell
                     colSpan={activeTab === "invoices" ? 8 : 7}
-                    className="text-center py-8 text-gray-500"
+                    className="text-center py-8 text-slate-500"
                   >
                     No documents found matching your criteria.
                   </TableCell>

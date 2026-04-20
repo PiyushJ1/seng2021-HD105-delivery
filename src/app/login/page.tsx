@@ -89,7 +89,7 @@ export default function LoginPage() {
               onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-sky-600"
               placeholder="you@example.com"
             />
           </div>
@@ -109,7 +109,7 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="current-password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-sky-600"
               placeholder="Enter your password"
             />
           </div>
@@ -117,7 +117,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg bg-sky-600 px-4 py-2 font-medium text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Logging in..." : "Log In"}
           </button>
@@ -147,10 +147,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-sm text-slate-600">
           New here?{" "}
-          <Link
-            href="/register"
-            className="font-medium text-blue-600 underline"
-          >
+          <Link href="/register" className="font-medium text-sky-600 underline">
             Create an account
           </Link>
         </p>

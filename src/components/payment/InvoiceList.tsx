@@ -202,8 +202,8 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-semibold text-gray-900">Invoices</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-3xl font-semibold text-slate-900">Invoices</h1>
+        <p className="text-slate-500 mt-1">
           Manage invoices and payment approvals
         </p>
       </div>
@@ -214,11 +214,11 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Pending Approval</p>
-                <p className="text-2xl font-semibold text-gray-900 mt-2">
+                <p className="text-sm text-slate-500">Pending Approval</p>
+                <p className="text-2xl font-semibold text-slate-900 mt-2">
                   ${totalPending.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {invoices.filter((inv) => inv.status === "Pending").length}{" "}
                   invoices
                 </p>
@@ -234,11 +234,11 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Overdue</p>
+                <p className="text-sm text-slate-500">Overdue</p>
                 <p className="text-2xl font-semibold text-red-600 mt-2">
                   ${totalOverdue.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {invoices.filter((inv) => inv.overdue).length} invoices
                 </p>
               </div>
@@ -253,11 +253,11 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Paid This Month</p>
+                <p className="text-sm text-slate-500">Paid This Month</p>
                 <p className="text-2xl font-semibold text-green-600 mt-2">
                   ${totalPaid.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {invoices.filter((inv) => inv.status === "Paid").length}{" "}
                   invoices
                 </p>
@@ -275,7 +275,7 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search by invoice ID, order ID, or supplier..."
                 className="pl-10"
@@ -340,7 +340,7 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
                 {filteredInvoices.map((invoice) => (
                   <TableRow
                     key={invoice.id}
-                    className={`hover:bg-gray-50 ${
+                    className={`hover:bg-slate-50 ${
                       invoice.overdue ? "bg-red-50" : ""
                     }`}
                   >
@@ -382,13 +382,13 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
             </Table>
           ) : (
             <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                <Search className="h-8 w-8 text-gray-400" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                <Search className="h-8 w-8 text-slate-400" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-slate-900 mb-2">
                 No invoices found
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-500">
                 Try adjusting your filters or search query
               </p>
             </div>
