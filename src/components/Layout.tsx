@@ -105,7 +105,7 @@ export function Layout({ children, currentView, onNavigate }: LayoutProps) {
             <LayoutDashboard className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            HD105
+            SupplyFlow
           </h1>
         </div>
 
@@ -224,7 +224,7 @@ export function Layout({ children, currentView, onNavigate }: LayoutProps) {
                   >
                     <Avatar className="h-8 w-8 rounded-md">
                       <AvatarFallback className="bg-indigo-600 text-white font-medium text-xs">
-                        JD
+                        SK
                       </AvatarFallback>
                     </Avatar>
                     <div className="hidden flex-col items-start text-left sm:flex">
