@@ -40,7 +40,7 @@ const docTypes = [
     label: "Invoices (E-Invoice)",
     icon: FileText,
     color: "blue",
-    count: 234,
+    count: 7,
     highlight: true,
   },
   {
@@ -48,21 +48,21 @@ const docTypes = [
     label: "Credit Notes",
     icon: CreditCard,
     color: "green",
-    count: 18,
+    count: 4,
   },
   {
     key: "debit-notes",
     label: "Debit Notes",
     icon: MinusCircle,
     color: "orange",
-    count: 7,
+    count: 3,
   },
   {
     key: "application-responses",
     label: "Application Responses",
     icon: MessageSquare,
     color: "purple",
-    count: 156,
+    count: 5,
   },
 ];
 
