@@ -80,16 +80,16 @@ export function InvoiceDetail({
       phone: "+61 2 9000 1122",
     },
     buyer: {
-      name: "Acme Corporation",
-      address: "123 Business Street, New York, NY 10001",
+      name: "Sam Holdings Pty Ltd",
+      address: "Level 8, 120 Clarence Street, Sydney, NSW 2000",
       taxId: "98-7654321",
-      email: "ap@acme.com",
-      phone: "+1 (555) 123-4567",
+      email: "ap@samholdings.com.au",
+      phone: "+61 2 9100 4455",
     },
     lineItems: [
       {
         id: 1,
-        description: "Wireless Office Keyboard",
+        description: "Keyboard",
         quantity: 10,
         unitPrice: 100.0,
         taxRate: 0.08,
