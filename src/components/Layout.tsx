@@ -229,7 +229,7 @@ export function Layout({ children, currentView, onNavigate }: LayoutProps) {
                     </Avatar>
                     <div className="hidden flex-col items-start text-left sm:flex">
                       <span className="text-sm font-semibold text-slate-900 leading-none">
-                        John Doe
+                        Samridh Karol
                       </span>
                       <span className="text-xs text-slate-500 mt-1 block leading-none">
                         Procurement
