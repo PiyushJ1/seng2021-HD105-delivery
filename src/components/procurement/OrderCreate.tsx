@@ -95,66 +95,43 @@ export function OrderCreate({ onNavigate }: OrderCreateProps) {
       return;
     }
 
-    const apiKey = localStorage.getItem("apiKey");
-    if (!apiKey) {
-      toast.error("No API key found. Please log in again.");
-      return;
-    }
+    const orderId = "PO-2026-0402";
+    const createdDate = new Date().toISOString().split("T")[0];
+    const totalAmount = calculateTotal() * 1.08 + 250;
 
-    try {
-      const response = await fetch("/api/order/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          buyer_customer_party: {
-            name: "Acme Corporation",
-            tax: { company_id: "ACME-001" },
-            contact: { email: localStorage.getItem("email") },
-          },
-          seller_customer_party: {
-            name: supplier,
-            tax: { company_id: supplier },
-            contact: { email: `contact@${supplier}.com` },
-          },
-          order_date: new Date().toISOString().split("T")[0],
-          delivery_date: deliveryDate,
-          priority,
-          payment_terms: "net-30",
-          notes,
-          items: items.map((item) => ({
-            id: item.sku,
-            name: item.name,
-            quantity: item.quantity,
-            unit_price: item.unitPrice,
-          })),
-        }),
-      });
+    const mockOrder = {
+      orderId,
+      reference: "REQ-8892",
+      supplier,
+      date: createdDate,
+      status: "Pending",
+      amount: `$${totalAmount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      items: items.map((item) => ({
+        id: item.sku,
+        name: item.name,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+      })),
+      priority,
+      delivery_date: deliveryDate,
+      payment_terms: "net-30",
+      notes,
+    };
 
-      console.log(response)
+    localStorage.setItem("lastOrderId", orderId);
+    localStorage.setItem("lastOrder", JSON.stringify(mockOrder));
+    localStorage.removeItem("lastInvoice");
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to create order");
-      }
+    toast.success("Order created successfully!", {
+      description: `Order ID: ${orderId}`,
+    });
 
-      const orderData = await response.json();
-      localStorage.setItem("lastOrderId", orderData.orderId);
-
-      toast.success("Order created successfully!", {
-        description: `Order ID: ${orderData.orderId}`,
-      });
-
-      setTimeout(() => {
-        onNavigate("orders");
-      }, 1500);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create order",
-      );
-    }
+    setTimeout(() => {
+      onNavigate("orders");
+    }, 1200);
   };
 
   return (

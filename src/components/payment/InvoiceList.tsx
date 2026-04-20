@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -18,99 +18,161 @@ import {
   SelectValue,
 } from "../ui/select";
 import { StatusBadge } from "../StatusBadge";
-import { Search, Filter, Download, Eye, AlertCircle } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Download,
+  Eye,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 
 interface InvoiceListProps {
   onNavigate: (view: string, invoiceId?: string) => void;
 }
 
+type Invoice = {
+  id: string;
+  orderId: string;
+  supplier: string;
+  issueDate: string;
+  dueDate: string;
+  amount: number;
+  status: string;
+  overdue: boolean;
+};
+
+const baseInvoices: Invoice[] = [
+  {
+    id: "INV-2026-0412",
+    orderId: "PO-2026-0401",
+    supplier: "ABC Corporation",
+    issueDate: "2026-04-05",
+    dueDate: "2026-05-05",
+    amount: 49247.8,
+    status: "Pending",
+    overdue: false,
+  },
+  {
+    id: "INV-2026-0411",
+    orderId: "PO-2026-0400",
+    supplier: "XYZ Industries Ltd",
+    issueDate: "2026-04-04",
+    dueDate: "2026-05-04",
+    amount: 31266.54,
+    status: "Approved",
+    overdue: false,
+  },
+  {
+    id: "INV-2026-0410",
+    orderId: "PO-2026-0399",
+    supplier: "Global Supplies Inc",
+    issueDate: "2026-04-03",
+    dueDate: "2026-05-03",
+    amount: 73321.47,
+    status: "Paid",
+    overdue: false,
+  },
+  {
+    id: "INV-2026-0409",
+    orderId: "PO-2026-0398",
+    supplier: "Tech Solutions Co",
+    issueDate: "2026-03-15",
+    dueDate: "2026-04-15",
+    amount: 16923.6,
+    status: "Pending",
+    overdue: false,
+  },
+  {
+    id: "INV-2026-0408",
+    orderId: "PO-2026-0397",
+    supplier: "Metro Trading",
+    issueDate: "2026-03-10",
+    dueDate: "2026-03-25",
+    amount: 99727.61,
+    status: "Pending",
+    overdue: true,
+  },
+  {
+    id: "INV-2026-0407",
+    orderId: "PO-2026-0396",
+    supplier: "ABC Corporation",
+    issueDate: "2026-03-08",
+    dueDate: "2026-04-08",
+    amount: 37324.8,
+    status: "Approved",
+    overdue: false,
+  },
+  {
+    id: "INV-2026-0406",
+    orderId: "PO-2026-0395",
+    supplier: "Pacific Imports",
+    issueDate: "2026-03-05",
+    dueDate: "2026-04-05",
+    amount: 55296.54,
+    status: "Paid",
+    overdue: false,
+  },
+  {
+    id: "INV-2026-0405",
+    orderId: "PO-2026-0394",
+    supplier: "Regional Suppliers",
+    issueDate: "2026-02-28",
+    dueDate: "2026-03-15",
+    amount: 13446.0,
+    status: "Rejected",
+    overdue: true,
+  },
+];
+
 export function InvoiceList({ onNavigate }: InvoiceListProps) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [invoices, setInvoices] = useState<Invoice[]>(baseInvoices);
 
-  const invoices = [
-    {
-      id: "INV-2026-0412",
-      orderId: "PO-2026-0401",
-      supplier: "ABC Corporation",
-      issueDate: "2026-04-05",
-      dueDate: "2026-05-05",
-      amount: 49247.8,
-      status: "Pending",
-      overdue: false,
-    },
-    {
-      id: "INV-2026-0411",
-      orderId: "PO-2026-0400",
-      supplier: "XYZ Industries Ltd",
-      issueDate: "2026-04-04",
-      dueDate: "2026-05-04",
-      amount: 31266.54,
-      status: "Approved",
-      overdue: false,
-    },
-    {
-      id: "INV-2026-0410",
-      orderId: "PO-2026-0399",
-      supplier: "Global Supplies Inc",
-      issueDate: "2026-04-03",
-      dueDate: "2026-05-03",
-      amount: 73321.47,
-      status: "Paid",
-      overdue: false,
-    },
-    {
-      id: "INV-2026-0409",
-      orderId: "PO-2026-0398",
-      supplier: "Tech Solutions Co",
-      issueDate: "2026-03-15",
-      dueDate: "2026-04-15",
-      amount: 16923.6,
-      status: "Pending",
-      overdue: false,
-    },
-    {
-      id: "INV-2026-0408",
-      orderId: "PO-2026-0397",
-      supplier: "Metro Trading",
-      issueDate: "2026-03-10",
-      dueDate: "2026-03-25",
-      amount: 99727.61,
-      status: "Pending",
-      overdue: true,
-    },
-    {
-      id: "INV-2026-0407",
-      orderId: "PO-2026-0396",
-      supplier: "ABC Corporation",
-      issueDate: "2026-03-08",
-      dueDate: "2026-04-08",
-      amount: 37324.8,
-      status: "Approved",
-      overdue: false,
-    },
-    {
-      id: "INV-2026-0406",
-      orderId: "PO-2026-0395",
-      supplier: "Pacific Imports",
-      issueDate: "2026-03-05",
-      dueDate: "2026-04-05",
-      amount: 55296.54,
-      status: "Paid",
-      overdue: false,
-    },
-    {
-      id: "INV-2026-0405",
-      orderId: "PO-2026-0394",
-      supplier: "Regional Suppliers",
-      issueDate: "2026-02-28",
-      dueDate: "2026-03-15",
-      amount: 13446.0,
-      status: "Rejected",
-      overdue: true,
-    },
-  ];
+  const loadDemoInvoices = () => {
+    if (typeof window === "undefined") {
+      setInvoices(baseInvoices);
+      return;
+    }
+
+    const saved = localStorage.getItem("lastInvoice");
+    if (!saved) {
+      setInvoices(baseInvoices);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as Partial<Invoice>;
+      if (!parsed.id) {
+        setInvoices(baseInvoices);
+        return;
+      }
+
+      const demoInvoice: Invoice = {
+        id: parsed.id,
+        orderId: parsed.orderId ?? "PO-2026-0402",
+        supplier: parsed.supplier ?? "Tech Solutions Co",
+        issueDate: parsed.issueDate ?? "2026-04-21",
+        dueDate: parsed.dueDate ?? "2026-05-21",
+        amount: parsed.amount ?? 1330,
+        status: parsed.status ?? "Pending",
+        overdue: parsed.overdue ?? false,
+      };
+
+      const withoutDuplicate = baseInvoices.filter(
+        (invoice) => invoice.id !== demoInvoice.id,
+      );
+      setInvoices([demoInvoice, ...withoutDuplicate]);
+    } catch {
+      setInvoices(baseInvoices);
+    }
+  };
+
+  useEffect(() => {
+    loadDemoInvoices();
+  }, []);
 
   const filteredInvoices = invoices.filter((invoice) => {
     const matchesStatus =
@@ -236,6 +298,10 @@ export function InvoiceList({ onNavigate }: InvoiceListProps) {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
+            <Button variant="outline" className="gap-2" onClick={loadDemoInvoices}>
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </Button>
             <Button variant="outline" className="gap-2">
               <Download className="h-4 w-4" />
               Export
