@@ -57,6 +57,7 @@ export default function LoginPage() {
       }
 
       // setSuccessMessage(payload.message ?? "Logged in successfully!");
+      localStorage.setItem("email", email);
       router.push("/dashboard");
     } catch {
       setErrorMessage(
