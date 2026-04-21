@@ -326,18 +326,19 @@ export default function LandingPage() {
           <div className="mx-auto w-full max-w-6xl">
             <div className="rounded-3xl border border-slate-200/85 bg-linear-to-br from-white to-sky-50 p-8 text-center shadow-xl shadow-slate-900/5 md:p-12">
               <h2 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
-                Ready to pitch a product, not just a prototype?
+                Ready to level up your business workflow?
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-                Show a complete procurement-to-payment journey with clean UI,
-                deterministic workflows, and downloadable invoice artifacts.
+                Enhance your complete procurement-to-payment journey with clean
+                dashboards, deterministic workflows, and downloadable invoice
+                artifacts.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/dashboard"
                   className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-700"
                 >
-                  Launch demo
+                  Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
